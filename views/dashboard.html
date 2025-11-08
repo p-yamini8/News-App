@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Account Details</title>
+  <style>
+    #account-details {
+      display: none; /* hidden initially */
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 8px;
+      width: 250px;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+    <div id="head">
+        <h1>News Express</h1>
+
+    </div>
+    <div>
+        <nav>
+            <a href="news.html">News</a>
+            <a href="politics.html">Politics</a>
+            <a href="business.html">Business</a>
+            <a href="fun.html">Fun</a>
+            <a href="games.html">Games</a>
+            <a href="movies.html">Movies</a>
+            <a href="admin.html" style="display: block;">Admin</a>
+            <button id="account-btn">Account</button>
+
+  <div id="account-details">
+    <h3>Your Account</h3>
+    <p><strong>Name:</strong> Yamini</p>
+    <p><strong>Email:</strong> yamini@example.com</p>
+    <p><strong>Plan:</strong> Premium</p>
+    <p><strong>Likes</strong><ol id="likes"></ol></p>
+    <p><strong>UnLikes</strong><ol id='unlikes'></ol></p>
+  </div>
+
+  <script>
+    const accountBtn = document.getElementById('account-btn');
+    const accountDetails = document.getElementById('account-details');
+ accountDetails.style.display = 'none';
+    accountBtn.addEventListener('click', () => {
+      // Toggle visibility
+      if (accountDetails.style.display === 'none') {
+        accountDetails.style.display = 'block';
+      } else {
+        accountDetails.style.display = 'none';
+      }
+    });
+  </script>
+
+        </nav>
+    </div>
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+</head>
+<body>
+
+  <button id="account-btn">Account</button>
+
+  <div id="account-details">
+    <h3>Your Account</h3>
+    <p><strong>Name:</strong> Yamini</p>
+    <p><strong>Email:</strong> yamini@example.com</p>
+    <p><strong>Plan:</strong> Premium</p>
+  </div>
+
+  <script>
+    const accountBtn = document.getElementById('account-btn');
+    const accountDetails = document.getElementById('account-details');
+
+    accountBtn.addEventListener('click', () => {
+      // Toggle visibility
+      if (accountDetails.style.display === 'none') {
+        accountDetails.style.display = 'block';
+      } else {
+        accountDetails.style.display = 'none';
+      }
+    });
+  </script>
+
+</body>
+</html> -->
