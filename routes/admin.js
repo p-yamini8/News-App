@@ -1,7 +1,7 @@
 const path = require('path');
-
+const auth=require('../middleware/auth')
 const express=require('express');
-console.log('123')
+
 const multer=require('multer');
 const adminController=require('../controllers/admin');
 const router=express.Router();
@@ -15,6 +15,6 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-router.post('/addPost', upload.single('image'), adminController.addPost);
+router.post('/addPost',auth.authenticate, upload.single('image'), adminController.addPost);
 
 module.exports=router;

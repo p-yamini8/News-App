@@ -37,10 +37,13 @@
       formData.append('image', image);
       formData.append('description', description);
       formData.append('category', category);
-
+const token=localStorage.getItem('token')
       try {
         const res = await fetch('/admin/addPost', {
           method: 'POST',
+          headers:{
+            'Authorization':`Bearer ${token}`
+          },
           body: formData
         });
 
