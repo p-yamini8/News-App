@@ -1,23 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Page</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Page</title>
 </head>
 <body>
-    <form id="admin-form">
-        <input type="file"  id="image" accept="image/**" required>
-    <input type="description" id="disc">
-    category:<select>
-        <option>Politics</option>
-        <option>Business</option>
-        <option>Fun</option>
-        <option>Sports</option>
-    </select>
-    <button id="submit">Submit</button>
+  <form id="admin-form" enctype="multipart/form-data">
+    <input type="file" id="image" accept="image/*" required><br><br>
+
+    <input type="text" id="disc" placeholder="Enter description" required><br><br>
+
+    Category:
+    <select id="ctg">
+      <option>Politics</option>
+      <option>Business</option>
+      <option>Fun</option>
+      <option>Sports</option>
+    </select><br><br>
+
+    <button type="submit" id="submit">Submit</button>
     <a href="dashboard.html">Back</a>
-    </form>
-   
+  </form>
+
+  <script>
+    const form = document.getElementById('admin-form');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const image = document.getElementById('image').files[0];
+      const description = document.getElementById('disc').value;
+      const category = document.getElementById('ctg').value;
+
+      const formData = new FormData();
+      formData.append('image', image);
+      formData.append('description', description);
+      formData.append('category', category);
+
+      try {
+        const res = await fetch('/admin/addPost', {
+          method: 'POST',
+          body: formData
+        });
+
+        let result;
+        try {
+          result = await res.json();
+        } catch {
+          result = {};
+        }
+
+        if (res.ok) {
+          alert('Post created successfully!');
+        } else {
+          alert(result.message || 'Failed to create post');
+        }
+      } catch (err) {
+        console.log('Error:', err);
+        alert('Server error');
+      }
+    });
+  </script>
 </body>
 </html>
