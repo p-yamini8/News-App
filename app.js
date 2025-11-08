@@ -13,13 +13,13 @@ app.use(express.static(path.join(__dirname,'views')));
 app.use('/uploads', express.static('uploads'));
 
 app.use('/user',userRoutes);
-
+app.use('/admin',adminRoutes);
 app.use('/',(req,res)=>{
     res.sendFile(path.join(__dirname,'views','signup.html'))
 })
 
 
-app.use('/admin',adminRoutes);
+
 sequelize.sync().then(()=>{
     console.log('connected');
 }).catch((err)=>{
