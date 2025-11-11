@@ -32,17 +32,18 @@
       const image = document.getElementById('image').files[0];
       const description = document.getElementById('disc').value;
       const category = document.getElementById('ctg').value;
+      const token = localStorage.getItem('token');
 
       const formData = new FormData();
       formData.append('image', image);
       formData.append('description', description);
       formData.append('category', category);
-const token=localStorage.getItem('token')
+
       try {
         const res = await fetch('/admin/addPost', {
           method: 'POST',
-          headers:{
-            'Authorization':`Bearer ${token}`
+          headers: {
+            'Authorization': `Bearer ${token}`
           },
           body: formData
         });
@@ -55,7 +56,26 @@ const token=localStorage.getItem('token')
         }
 
         if (res.ok) {
-          alert('Post created successfully!');
+          alert('✅ Post created successfully!');
+
+          // 🔁 Redirect based on category
+          switch (category.toLowerCase()) {
+            case 'politics':
+              window.location.href = 'politics.html';
+              break;
+            case 'business':
+              window.location.href = 'business.html';
+              break;
+            case 'fun':
+              window.location.href = 'fun.html';
+              break;
+            case 'sports':
+              window.location.href = 'sports.html';
+              break;
+            default:
+              alert('Unknown category');
+          }
+
         } else {
           alert(result.message || 'Failed to create post');
         }
