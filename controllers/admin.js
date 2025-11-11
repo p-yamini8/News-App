@@ -1,5 +1,6 @@
-const Post = require('../models/post');
 
+const Post = require('../models/post');
+const User=require('../models/user')
 exports.addPost = async (req, res) => {
   try {
     
@@ -14,14 +15,14 @@ exports.addPost = async (req, res) => {
       return res.status(400).json({ message: 'Enter all details' });
     }
 
-    const imagePath = image.path; // or image.filename
+const imagePath = '/' + image.path.replace(/\\/g, '/');
+console.log("🟢 Received data:",imagePath);
 
     await Post.create({
       image: imagePath,
       description,
       category,
     });
-
     console.log('✅ Post created successfully');
     return res.status(201).json({ message: 'Post created successfully' });
   } catch (err) {
@@ -29,3 +30,22 @@ exports.addPost = async (req, res) => {
     return res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
+exports.getPost = async (req, res) => {
+  try {
+    const { category } = req.query;
+
+    const whereClause = category ? { category } : {};
+
+    const posts = await Post.findAll({
+      where: whereClause,
+      include: [{ model: User, attributes: ['id', 'name', 'email'] }],
+    });
+
+    res.status(200).json(posts);
+  } catch (err) {
+    console.error('❌ ERROR in getPost:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Politics News</title>
+</head>
+<body>
+  <h1>Politics Posts</h1>
+  <div id="posts"></div>
+
+  <script>
+  async function loadPoliticsPosts() {
+  try {
+    const token = localStorage.getItem('token'); // get token from login
+    const res = await fetch('http://localhost:3000/post/getPost?category=Politics', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+        const posts = await res.json();
+
+
+        const postsDiv = document.getElementById('posts');
+        postsDiv.innerHTML = ''; // Clear old posts
+
+        posts.forEach(p => {
+          const card = document.createElement('div');
+          card.style.border = "1px solid #ccc";
+          card.style.margin = "10px";
+          card.style.padding = "10px";
+          card.innerHTML = `<div style="border:1px solid #aaa; padding:10px; margin:10px;">
+          <img src="http://localhost:3000${p.image}" width="150">
+<br>
+          
+
+            <b>Description:</b> ${p.description}<br>
+            <b>Category:</b> ${p.category}<br>
+            <b>Posted by:</b> ${p.User ? p.User.name : 'Unknown'}
+          `;
+          postsDiv.appendChild(card);
+        });
+      } catch (err) {
+        console.log('Error fetching posts:', err);
+      }
+    }
+
+    loadPoliticsPosts();
+  </script>
+</body>
+</html>
