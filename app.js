@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname,'views')));
 
 
 app.use('/user',userRoutes);
-app.use('/admin',adminRoutes);
+// app.use('/admin',adminRoutes);
 app.use('/post', postRoutes);
 app.use('/',(req,res)=>{
     res.sendFile(path.join(__dirname,'views','signup.html'))

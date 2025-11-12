@@ -44,64 +44,54 @@
             <button id="account-btn">Account</button>
 
   <div id="account-details">
-    <h3>Your Account</h3>
-    <p><strong>Name:</strong> Yamini</p>
-    <p><strong>Email:</strong> yamini@example.com</p>
-    <p><strong>Plan:</strong> Premium</p>
-    <p><strong>Likes</strong><ol id="likes"></ol></p>
-    <p><strong>UnLikes</strong><ol id='unlikes'></ol></p>
-  </div>
+  <h3>Your Account</h3>
+  <p><strong>Name:</strong> <span id="acc-name"></span></p>
+  <p><strong>Email:</strong> <span id="acc-email"></span></p>
+  <p><strong>Plan:</strong> <span id="acc-plan"></span></p>
+  <p><strong>Likes</strong><ol id="likes"></ol></p>
+  <p><strong>UnLikes</strong><ol id="unlikes"></ol></p>
+</div>
 
-  <script>
-    const accountBtn = document.getElementById('account-btn');
-    const accountDetails = document.getElementById('account-details');
- accountDetails.style.display = 'none';
-    accountBtn.addEventListener('click', () => {
-      // Toggle visibility
-      if (accountDetails.style.display === 'none') {
-        accountDetails.style.display = 'block';
-      } else {
-        accountDetails.style.display = 'none';
-      }
-    });
-  </script>
+<script>
+  const accountBtn = document.getElementById('account-btn');
+  const accountDetails = document.getElementById('account-details');
+
+  const nameSpan = document.getElementById('acc-name');
+  const emailSpan = document.getElementById('acc-email');
+  const planSpan = document.getElementById('acc-plan');
+
+  // Toggle visibility
+  accountBtn.addEventListener('click', () => {
+    accountDetails.style.display = accountDetails.style.display === 'none' ? 'block' : 'none';
+  });
+
+  // Fetch user details from backend
+  async function loadAccountDetails() {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const res = await fetch('http://localhost:3000/user/profile', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!res.ok) throw new Error('Failed to fetch user');
+
+      const user = await res.json();
+      console.log('user details',user)
+      nameSpan.textContent = user.name;
+      emailSpan.textContent = user.email;
+      planSpan.textContent = user.plan || 'Free';
+    } catch (err) {
+      console.error('Error loading account:', err);
+    }
+  }
+
+  loadAccountDetails();
+</script>
+
 
         </nav>
     </div>
 </body>
 </html>
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-</head>
-<body>
-
-  <button id="account-btn">Account</button>
-
-  <div id="account-details">
-    <h3>Your Account</h3>
-    <p><strong>Name:</strong> Yamini</p>
-    <p><strong>Email:</strong> yamini@example.com</p>
-    <p><strong>Plan:</strong> Premium</p>
-  </div>
-
-  <script>
-    const accountBtn = document.getElementById('account-btn');
-    const accountDetails = document.getElementById('account-details');
-
-    accountBtn.addEventListener('click', () => {
-      // Toggle visibility
-      if (accountDetails.style.display === 'none') {
-        accountDetails.style.display = 'block';
-      } else {
-        accountDetails.style.display = 'none';
-      }
-    });
-  </script>
-
-</body>
-</html> -->
