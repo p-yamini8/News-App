@@ -7,11 +7,11 @@
 </head>
 <body>
   <form id="admin-form" enctype="multipart/form-data">
-    <input type="file" id="image" accept="image/*" required><br><br>
+Image: <input type="file" id="image" name="image" accept="image/*" required><br><br>
 
-    <input type="text" id="disc" placeholder="Enter description" required><br><br>
-
-    Category:
+ Title:<input type="text" id="title" placeholder="Enter Title" required><br>
+Description:<input type="text" id="disc" placeholder="Enter description" required><br><br>
+Category:
     <select id="ctg">
       <option>Politics</option>
       <option>Business</option>
@@ -28,19 +28,21 @@
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-
+ 
       const image = document.getElementById('image').files[0];
       const description = document.getElementById('disc').value;
+       const title = document.getElementById('title').value;
       const category = document.getElementById('ctg').value;
       const token = localStorage.getItem('token');
 
       const formData = new FormData();
       formData.append('image', image);
+       formData.append('title', title);
       formData.append('description', description);
       formData.append('category', category);
 
       try {
-        const res = await fetch('/admin/addPost', {
+        const res = await fetch('/post/addPost', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -61,16 +63,16 @@
           // 🔁 Redirect based on category
           switch (category.toLowerCase()) {
             case 'politics':
-              window.location.href = 'politics.html';
+              window.location.href = '/politics/politics.html';
               break;
             case 'business':
-              window.location.href = 'business.html';
+              window.location.href = '/business/business.html';
               break;
             case 'fun':
-              window.location.href = 'fun.html';
+              window.location.href = '/fun/fun.html';
               break;
             case 'sports':
-              window.location.href = 'sports.html';
+              window.location.href = '/sports/sports.html';
               break;
             default:
               alert('Unknown category');
