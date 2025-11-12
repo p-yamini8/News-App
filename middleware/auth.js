@@ -1,23 +1,20 @@
-const jwt=require('jsonwebtoken');
-const dotenv=require('dotenv');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
+const dotenv = require('dotenv');
 dotenv.config();
-exports.authenticate=async(req,res,next)=>{
-    try{
-        console.log('234')
-const authHeader = req.headers['authorization'];
-    if (!authHeader) {
-      return res.status(401).json({ message: 'No token provided' });
-    }
 
-    const token = authHeader.split(' ')[1]; 
-
-const user=await jwt.verify(token,process.env.JWT);
-req.user=user;
- next(); 
- 
+exports.authenticate = async (req, res, next) => {
+  try {
+    const token = req.header('Authorization').split(' ')[1];
+      if (!token) {
+      return res.status(401).json({ message: "Token missing" });
     }
-catch(err){
-    console.log(err);
-    return res.status(500).json({message:'auth error'})
-}
-}
+    const decoded = jwt.verify(token, process.env.JWT);
+    const user = await User.findByPk(decoded.userId);
+    if (!user) return res.status(401).json({ message: 'Unauthorized' });
+    req.user = user;
+    next();
+  } catch (err) {
+    res.status(401).json({ message: 'Authentication failed', error: err.message });
+  }
+};

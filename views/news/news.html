@@ -11,7 +11,7 @@
   <script>
     async function loadAllPosts() {
       try {
-        const res = await fetch('http://localhost:3000/post/get?category=Politics');
+        const res = await fetch('http://localhost:3000/post/getPost');
 
         const posts = await res.json();
 console.log('posts',res.resuit,res.message)
@@ -20,6 +20,7 @@ console.log('posts',res.resuit,res.message)
           postsDiv.innerHTML += `
             <div style="border:1px solid #aaa; padding:10px; margin:10px;">
               <img src="${p.image}" width="120"><br>
+              ${p.title}</b>
               <b>${p.category}</b>: ${p.description}
             </div>
           `;
