@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Business</title>
+  
+</head>
+<body>
+  <h1>Business Zone</h1>
+   <a href="../dashboard.html">Back</a>
+  <div id="posts"></div>
+
+  <script>
+    async function loadBusinessPosts() {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch('http://localhost:3000/post/getPost?category=business', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const posts = await res.json();
+console.log(posts);
+
+        const postsDiv = document.getElementById('posts');
+        postsDiv.innerHTML = '';
+
+        posts.forEach((p, i) => {
+          const div = document.createElement('div');
+          div.classList.add('post');
+
+          const postedTime = new Date(p.createdAt).toLocaleString();
+
+          div.innerHTML = `
+            <div class="card">
+              <img src="http://localhost:3000${p.image}" alt="Post Image">
+              <div class="card-content">
+                <h2>${p.category}</h2>
+                <p>${p.title}</p>
+                <p>${p.description}</p>
+                <div class="footer">
+                  <span>🕒 ${postedTime}</span>
+                  <span>Posted by: ${p.user ? p.user.name : 'Unknown'}</span>
+                </div>
+              </div>
+              <div class="actions">
+                <button class="action-btn like-btn"><span>❤️</span> Like</button>
+                <button class="action-btn comment-btn"><span>💬</span> Comment</button>
+                <button class="action-btn share-btn"><span>🔗</span> Share</button>
+              </div>
+            </div>
+          `;
+
+          postsDiv.appendChild(div);
+
+          // --- Like button ---
+          const likeBtn = div.querySelector('.like-btn');
+          let liked = false;
+          likeBtn.addEventListener('click', () => {
+            liked = !liked;
+            likeBtn.classList.toggle('liked', liked);
+            likeBtn.innerHTML = liked ? '❤️ Liked' : '🤍 Like';
+          });
+
+          // --- Comment button ---
+          const commentBtn = div.querySelector('.comment-btn');
+          commentBtn.addEventListener('click', () => {
+            const comment = prompt("Write your comment:");
+            if (comment) {
+              alert(`Comment added: "${comment}"`);
+              // Later: send comment to backend via fetch('/comment/add', {...})
+            }
+          });
+
+          // --- Share button ---
+          const shareBtn = div.querySelector('.share-btn');
+          shareBtn.addEventListener('click', async () => {
+            const shareData = {
+              title: p.title,
+              text: p.description,
+              url: window.location.href
+            };
+            try {
+              if (navigator.share) {
+                await navigator.share(shareData);
+              } else {
+                navigator.clipboard.writeText(shareData.url);
+                alert('Link copied to clipboard!');
+              }
+            } catch (err) {
+              console.log('Share failed:', err);
+            }
+          });
+        });
+      } catch (err) {
+        console.log('Error fetching posts:', err);
+      }
+    }
+
+    loadBusinessPosts();
+  </script>
+</body>
+<script src="./business.css"></script>
+</html>
