@@ -6,6 +6,7 @@ const sequelize=require('./util/database')
 const app=express();
 const userRoutes=require('./routes/user')
 const adminRoutes=require('./routes/admin')
+const likeRoutes=require('./routes/like')
 const postRoutes=require('./routes/post')
 app.use(bodyParser.urlencoded({extended:false}));
 const { User, Post } = require('./models/associations');
@@ -20,6 +21,7 @@ app.use(express.static(path.join(__dirname,'views')));
 
 
 app.use('/user',userRoutes);
+app.use('/like-comment',likeRoutes);
 // app.use('/admin',adminRoutes);
 app.use('/post', postRoutes);
 app.use('/',(req,res)=>{
