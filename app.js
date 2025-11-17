@@ -27,9 +27,8 @@ app.use('/post', postRoutes);
 app.use('/',(req,res)=>{
     res.sendFile(path.join(__dirname,'views','signup.html'))
 })
-
-sequelize.sync({ alter: true })
-  .then(() => console.log('✅ Tables synced correctly'))
+sequelize.sync()
+ .then(() => console.log('✅ Tables synced correctly'))
   .catch(err => console.error('❌ Sync error:', err));
 
 

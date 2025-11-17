@@ -2,52 +2,9 @@ const  Like = require('../models/like');
 const  Comment= require('../models/comment');
 const  User = require('../models/user');
 const { Op } = require('sequelize');
+const Post = require('../models/post');
 
 
-// // POST /like-comment/like
-// exports.likePost = async (req, res) => {
-//   try {
-//     const { postId, type } = req.body;
-//     const userId = req.user.id;
-
-//     // Check if user already liked/disliked this post
-//     const existing = await Like.findOne({ where: { userId, postId } });
-
-//     if (existing) {
-//       // If same type is clicked again, remove it (toggle off)
-//       if (existing.type === type) {
-//         await existing.destroy();
-//         return res.status(200).json({ message: `${type} removed` });
-//       } else {
-//         // If opposite type clicked, update it
-//         existing.type = type;
-//         await existing.save();
-//         return res.status(200).json({ message: `${type} updated` });
-//       }
-//     } else {
-//       // New like/dislike
-//       await Like.create({ userId, postId, type });
-//       return res.status(201).json({ message: `${type} added` });
-//     }
-
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'Something went wrong' });
-//   }
-// };
-
-// // GET /post/likes/:postId
-// exports.getLikeCounts = async (req, res) => {
-//   try {
-//     const { postId } = req.params;
-//     const likes = await Like.count({ where: { postId, type: 'like' } });
-//     const dislikes = await Like.count({ where: { postId, type: 'dislike' } });
-//     res.json({ likes, dislikes });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ error: 'Error getting like counts' });
-//   }
-// };
 // // Get likes/dislikes count
 exports.getLikes = async (req, res) => {
   try {
@@ -122,5 +79,31 @@ exports.addComment = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
+  }
+};
+exports.likes= async (req, res) => {
+  try {
+    const likes = await Like.findAll({
+      where: { userId: req.user.id, type: 'like' },
+      include: [{ model: Post, as: 'post' }]
+
+    });
+
+    res.json({ likes: likes.map(l => l.post)});
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching likes" });
+  }
+};
+exports.unlikes= async (req, res) => {
+  try {
+    const unlikes = await Like.findAll({
+      where: { userId: req.user.id, type: 'dislike' },
+      include: [{ model: Post, as: 'post' }]
+
+    });
+
+    res.json({ unlikes: unlikes.map(u => u.post) });
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching unlikes" });
   }
 };

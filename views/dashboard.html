@@ -4,27 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Account Details</title>
-  <style>
-    #account-details {
-      display: none; /* hidden initially */
-      border: 1px solid #ccc;
-      padding: 15px;
-      margin-top: 10px;
-      border-radius: 8px;
-      width: 250px;
-    }
-    button {
-      padding: 10px 15px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-  </style>
+  <link rel="stylesheet" href="./dashboard.css"></link>
 </head>
 <body>
 
@@ -45,14 +25,38 @@
 
   <div id="account-details">
   <h3>Your Account</h3>
+   <button id="dashboard">Dashboard</button>
   <p><strong>Name:</strong> <span id="acc-name"></span></p>
   <p><strong>Email:</strong> <span id="acc-email"></span></p>
   <p><strong>Plan:</strong> <span id="acc-plan"></span></p>
-  <p><strong>Likes</strong><ol id="likes"></ol></p>
-  <p><strong>UnLikes</strong><ol id="unlikes"></ol></p>
+  <p><strong>Likes:</strong></p>
+        <ol id="likes-list"></ol>
+
+        <p><strong>UnLikes:</strong></p>
+        <ol id="unlikes-list"></ol>
+      <button id="load-likes">Show Likes</button>
+        <button id="load-unlikes">Show Unlikes</button>
+
+  <button id="logout">Logout</button>
 </div>
 
 <script>
+  const likesList = document.getElementById('likes-list');
+const unlikesList = document.getElementById('unlikes-list');
+
+
+  const logout=document.querySelector('#logout')
+  logout.addEventListener('click',async(e)=>{
+    e.preventDefault()
+      window.location.href='./login.html'
+    
+  })
+    const dashboard=document.querySelector('#dashboard')
+ dashboard.addEventListener('click',async(e)=>{
+    e.preventDefault()
+     accountDetails.style.display = accountDetails.style.display === 'none' ? 'block' : 'none';
+    
+  })
   const accountBtn = document.getElementById('account-btn');
   const accountDetails = document.getElementById('account-details');
 
@@ -88,6 +92,68 @@
   }
 
   loadAccountDetails();
+ 
+// ⭐ Fetch All Likes
+document.getElementById('load-likes').addEventListener('click', async () => {
+  const token = localStorage.getItem('token');
+
+  try {
+    const res = await fetch('http://localhost:3000/like-comment/user-likes', {
+      mehod:'GET',
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    const data = await res.json();
+console.log('data',data)
+    likesList.innerHTML = "";   // Clear previous items
+
+    if (data.likes.length === 0) {
+      likesList.innerHTML = "<li>No likes found</li>";
+      return;
+    }
+
+    data.likes.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item.title || `Post ID: ${item.postId}`;
+      likesList.appendChild(li);
+    });
+
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+
+// ⭐ Fetch All UnLikes
+document.getElementById('load-unlikes').addEventListener('click', async () => {
+  const token = localStorage.getItem('token');
+
+  try {
+    const res = await fetch('http://localhost:3000/like-comment/user-unlikes', {
+      method:'GET',
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    const data = await res.json();
+
+    unlikesList.innerHTML = ""; // Clear previous list
+console.log('data',data)
+    if (data.unlikes.length === 0) {
+      unlikesList.innerHTML = "<li>No unlikes found</li>";
+      return;
+    }
+
+    data.unlikes.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item.title || `Post ID: ${item.postId}`;
+      unlikesList.appendChild(li);
+    });
+
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 </script>
 
 
