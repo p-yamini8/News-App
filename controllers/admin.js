@@ -63,3 +63,83 @@ exports.getPost = async (req, res) => {
       .json({ message: "Server error", error: err.message });
   }
 };
+exports.getMyPosts=async(req,res)=>{
+  try{
+    const userId=req.user.id
+     const posts = await Post.findAll({
+      where: { userId: userId },   // filter by user
+      include: [
+        {
+          model: User,
+          as: "user",
+          attributes: ["id", "name", "email"]
+        }
+      ],
+      order: [["createdAt", "DESC"]]
+    });
+
+ return res.status(200).json({posts});
+  }
+  catch(err)
+  {
+    console.log(err)
+     return res
+      .status(500)
+      .json({ message: "Server error", error: err.message });
+  }
+}
+exports.editPost=async(req,res)=>{
+  try{
+
+const {postId}=req.params;
+console.log('postId',postId);
+const post=await Post.findOne({where:{id:postId, userId: req.user.id }});
+if(!post)
+{
+  return res.status(404).json({message:'post not found'})
+}
+return res.status(200).json({message:'edit post success',post})
+  }
+  catch(err)
+  {
+    console.log(err);
+    return res.status(500).json({message:'server error'});
+  }
+}
+// PUT /post/update/:postId
+exports.updatePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { title, description, category } = req.body;
+
+    const post = await Post.findOne({
+      where: { id: postId, userId: req.user.id }
+    });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    let newImage = post.image;  // keep old image if not uploaded
+
+    if (req.file) {
+      newImage = `/uploads/${req.file.filename}`;  // update new image
+    }
+
+    await post.update({
+      title,
+      description,
+      category,
+      image: newImage
+    });
+
+    return res.status(200).json({
+      message: "Post updated successfully",
+      post
+    });
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};

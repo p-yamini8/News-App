@@ -1,5 +1,5 @@
 const path = require('path');
-const auth=require('../middleware/auth')
+const auth=require('../middleware/auth');
 const express=require('express');
 
 const multer=require('multer');
@@ -17,4 +17,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 router.post('/addPost',auth.authenticate, upload.single('image'), adminController.addPost);
 router.get('/getPost',adminController.getPost);
+router.get('/my-posts',auth.authenticate,adminController.getMyPosts);
+router.get('/edit/:postId',auth.authenticate,adminController.editPost);
+router.put('/update/:postId',auth.authenticate,upload.single("image"),adminController.updatePost)
 module.exports=router;

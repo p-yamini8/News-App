@@ -3,161 +3,447 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Account Details</title>
-  <link rel="stylesheet" href="./dashboard.css"></link>
+    <title>Account Details</title>
+    <link rel="stylesheet" href="./dashboard.css">
+
+    <style>
+        .section-box {
+            border:1px solid #ccc;
+            padding:10px;
+            margin-top:10px;
+            border-radius:10px;
+            background:#f7f7f7;
+        }
+        .section-box h3 {
+            margin:0;
+            cursor:pointer;
+            padding:5px;
+        }
+        .hidden {
+            display:none;
+        }
+        .post-item {
+            padding:8px;
+            background:white;
+            margin:6px 0;
+            border-radius:6px;
+            display:flex;
+            justify-content:space-between;
+            border:1px solid #ddd;
+        }
+        .post-btn {
+            padding:5px 10px;
+            border:none;
+            border-radius:5px;
+            cursor:pointer;
+        }
+        .edit-btn { background:#007bff; color:white; }
+        .delete-btn { background:#d11a2a; color:white; }
+    </style>
+
 </head>
 <body>
 
-    <div id="head">
-        <h1>News Express</h1>
+<div id="head">
+    <h1>News Express</h1>
+</div>
+
+<nav>
+    <a href="./news/news.html">News</a>
+    <a href="./politics/politics.html">Politics</a>
+    <a href="./business/business.html">Business</a>
+    <a href="./fun/fun.html">Fun</a>
+    <a href="./sports/sports.html">Sports</a>
+    <a href="./movies/movies.html">Movies</a>
+    <a href="admin.html">Admin</a>
+
+    <button id="account-btn">Account</button>
+
+    <div id="account-details" style="display: none; margin-top:15px;">
+        
+        <h3>Your Account</h3>
+
+        <!-- Profile Image -->
+        <img id="profile-img" src="./default-user.png" style="
+            width:90px;height:90px;border-radius:50%;border:2px solid #444;margin-bottom:10px;">
+        
+        <button id="edit-profile-btn">Edit Profile</button>
+
+        <p><strong>Name:</strong> <span id="acc-name"></span></p>
+        <p><strong>Email:</strong> <span id="acc-email"></span></p>
+        <p><strong>Plan:</strong> <span id="acc-plan"></span></p>
+        <p><strong>Last Login:</strong> <span id="last-login"></span></p>
+
+        <hr>
+
+        <!-- Saved Posts Section -->
+        <div class="section-box">
+            <h3 onclick="toggleSection('saved-section')">📌 Saved Posts</h3>
+            <div id="saved-section" class="hidden">
+                <ol id="saved-list"></ol>
+                <button onclick="loadSavedPosts()">Load Saved Posts</button>
+            </div>
+        </div>
+
+        <!-- User Posts -->
+        <div class="section-box">
+            <h3 onclick="toggleSection('myposts-section')">📝 Your Posts</h3>
+            <div id="myposts-section" class="hidden">
+                <div id="myposts-list"></div>
+                <button onclick="loadMyPosts()">Load Your Posts</button>
+            </div>
+        </div>
+
+        <!-- Likes -->
+        <div class="section-box">
+            <h3 onclick="toggleSection('likes-section')">❤️ Likes</h3>
+            <div id="likes-section" class="hidden">
+                <p>Total Likes: <span id="total-likes">0</span></p>
+                <ol id="likes-list"></ol>
+                <button id="load-likes">Show Likes</button>
+            </div>
+        </div>
+
+        <!-- Unlikes -->
+        <div class="section-box">
+            <h3 onclick="toggleSection('unlikes-section')">👎 UnLikes</h3>
+            <div id="unlikes-section" class="hidden">
+                <p>Total Unlikes: <span id="total-unlikes">0</span></p>
+                <ol id="unlikes-list"></ol>
+                <button id="load-unlikes">Show Unlikes</button>
+            </div>
+        </div>
+
+        <hr>
+
+        <button id="delete-account" style="background:#d11a2a;color:white;padding:10px;border:none;border-radius:5px;">
+            Delete Account
+        </button>
+
+        <button id="back">Back</button>
+        <button id="logout">Logout</button>
 
     </div>
-    <div>
-        <nav>
-            <a href="./news/news.html">News</a>
-            <a href="./politics/politics.html">Politics</a>
-            <a href="./business/business.html">Business</a>
-            <a href="./fun/fun.html">Fun</a>
-            <a href="./sports/sports.html">Sports</a>
-            <a href="./movies/movies.html">Movies</a>
-            <a href="admin.html" style="display: block;">Admin</a>
-            <button id="account-btn">Account</button>
+</nav>
+<!-- EDIT POST FORM (HIDDEN INITIALLY) -->
+<div id="edit-form-box" style="display:none; margin:20px; padding:15px; border:1px solid #ccc; border-radius:10px; background:#fff;">
+    <h3>Edit Post</h3>
 
-  <div id="account-details">
-  <h3>Your Account</h3>
-   <button id="dashboard">Dashboard</button>
-  <p><strong>Name:</strong> <span id="acc-name"></span></p>
-  <p><strong>Email:</strong> <span id="acc-email"></span></p>
-  <p><strong>Plan:</strong> <span id="acc-plan"></span></p>
-  <p><strong>Likes:</strong></p>
-        <ol id="likes-list"></ol>
+    <label>Title:</label>
+    <input type="text" id="edit-title" style="width:100%; padding:8px;"><br><br>
 
-        <p><strong>UnLikes:</strong></p>
-        <ol id="unlikes-list"></ol>
-      <button id="load-likes">Show Likes</button>
-        <button id="load-unlikes">Show Unlikes</button>
+    <label>Description:</label>
+    <textarea id="edit-description" style="width:100%; height:80px;"></textarea><br><br>
 
-  <button id="logout">Logout</button>
+    <label>Category:</label>
+    <input type="text" id="edit-category" style="width:100%; padding:8px;"><br><br>
+
+    <label>Change Image (optional):</label>
+    <input type="file" id="edit-image"><br><br>
+
+    <button onclick="saveEditedPost()" style="background:green; padding:8px 15px; border:none; color:white; border-radius:6px;">Save Changes</button>
+    <button onclick="closeEditForm()" style="background:gray; padding:8px 15px; border:none; color:white; border-radius:6px;">Cancel</button>
 </div>
 
 <script>
-  const likesList = document.getElementById('likes-list');
+
+/* ------------------ Toggle Sections ------------------- */
+function toggleSection(id) {
+    const box = document.getElementById(id);
+    box.classList.toggle("hidden");
+}
+
+/* ---------------- PROFILE INFO ---------------- */
+const nameSpan = document.getElementById('acc-name');
+const emailSpan = document.getElementById('acc-email');
+const planSpan = document.getElementById('acc-plan');
+const lastLoginSpan = document.getElementById('last-login');
+const profileImg = document.getElementById('profile-img');
+
+const likesList = document.getElementById('likes-list');
 const unlikesList = document.getElementById('unlikes-list');
+const savedList = document.getElementById('saved-list');
+const myPostsList = document.getElementById('myposts-list');
 
+const accountBtn = document.getElementById('account-btn');
+const accountDetails = document.getElementById('account-details');
 
-  const logout=document.querySelector('#logout')
-  logout.addEventListener('click',async(e)=>{
-    e.preventDefault()
-      window.location.href='./login.html'
-    
-  })
-    const dashboard=document.querySelector('#dashboard')
- dashboard.addEventListener('click',async(e)=>{
-    e.preventDefault()
-     accountDetails.style.display = accountDetails.style.display === 'none' ? 'block' : 'none';
-    
-  })
-  const accountBtn = document.getElementById('account-btn');
-  const accountDetails = document.getElementById('account-details');
+/* Toggle account card */
+accountBtn.addEventListener('click', () => {
+    accountDetails.style.display =
+        accountDetails.style.display === 'none' ? 'block' : 'none';
+    loadAccountDetails();
+});
 
-  const nameSpan = document.getElementById('acc-name');
-  const emailSpan = document.getElementById('acc-email');
-  const planSpan = document.getElementById('acc-plan');
-
-  // Toggle visibility
-  accountBtn.addEventListener('click', () => {
-    accountDetails.style.display = accountDetails.style.display === 'none' ? 'block' : 'none';
-  });
-
-  // Fetch user details from backend
-  async function loadAccountDetails() {
+/* Load Profile */
+async function loadAccountDetails() {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
+        const token = localStorage.getItem('token');
+        if (!token) return;
 
-      const res = await fetch('http://localhost:3000/user/profile', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+        const res = await fetch("http://localhost:3000/user/profile", {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
 
-      if (!res.ok) throw new Error('Failed to fetch user');
+        const user = await res.json();
 
-      const user = await res.json();
-      console.log('user details',user)
-      nameSpan.textContent = user.name;
-      emailSpan.textContent = user.email;
-      planSpan.textContent = user.plan || 'Free';
+        nameSpan.textContent = user.name;
+        emailSpan.textContent = user.email;
+        planSpan.textContent = user.plan || "Free";
+        lastLoginSpan.textContent = user.lastLogin || "Today";
+
+        if (user.profilePic) profileImg.src = user.profilePic;
+
+        localStorage.setItem("role", user.role);
+        localStorage.setItem("userId", user.id);
+
     } catch (err) {
-      console.error('Error loading account:', err);
+        console.error("Error loading account:", err);
     }
-  }
+}
 
-  loadAccountDetails();
- 
-// ⭐ Fetch All Likes
-document.getElementById('load-likes').addEventListener('click', async () => {
-  const token = localStorage.getItem('token');
+/* ---------------- SAVED POSTS ---------------- */
+async function loadSavedPosts() {
+    try {
+        const token = localStorage.getItem("token");
 
-  try {
-    const res = await fetch('http://localhost:3000/like-comment/user-likes', {
-      mehod:'GET',
-      headers: { "Authorization": `Bearer ${token}` }
+        const res = await fetch("http://localhost:3000/posts/saved", {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const data = await res.json();
+
+        savedList.innerHTML = "";
+
+        if (!data.posts?.length) {
+            savedList.innerHTML = "<li>No saved posts found</li>";
+            return;
+        }
+
+        data.posts.forEach(post => {
+            const li = document.createElement("li");
+            li.textContent = post.title;
+            savedList.appendChild(li);
+        });
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
+/* ---------------- YOUR POSTS ---------------- */
+async function loadMyPosts() {
+    try {
+      
+        const token = localStorage.getItem("token");
+        const userId = localStorage.getItem("userId");
+        const role = localStorage.getItem("role");
+
+        const res = await fetch("http://localhost:3000/post/my-posts", {
+            method:'GET',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const data = await res.json();
+        myPostsList.innerHTML = "";
+console.log('posts',data)
+      if ( data.posts.length === 0) {
+    myPostsList.innerHTML = "No posts created by you.";
+    return;
+}
+
+data.posts.forEach(post => {
+
+            const div = document.createElement("div");
+            div.className = "post-item";
+
+            div.innerHTML = `
+                <span>${post.title}</span>
+                <span>
+                    <button class="post-btn edit-btn" onclick="editPost(${post.id})">Edit</button>
+                    <button class="post-btn delete-btn" onclick="deletePost(${post.id})">Delete</button>
+                </span>
+            `;
+            
+            myPostsList.appendChild(div);
+        });
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function editPost(postId) {
+    try {document.getElementById("edit-form-box").style.display = "block";
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(`http://localhost:3000/post/edit/${postId}`, {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert("Unable to load post");
+            return;
+        }
+
+        console.log("Editing Post:", data.post);
+
+        // Fill form fields
+        document.getElementById("edit-title").value = data.post.title;
+        document.getElementById("edit-description").value = data.post.description;
+        document.getElementById("edit-category").value = data.post.category;
+
+        localStorage.setItem("editPostId", postId);
+
+        // Show edit form
+        document.getElementById("edit-form-box").style.display = "block";
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+/* DELETE POST */
+async function deletePost(postId) {
+    if (!confirm("Are you sure you want to delete this post?")) return;
+
+    try {
+        const token = localStorage.getItem("token");
+
+        await fetch(`http://localhost:3000/posts/delete/${postId}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        alert("Post deleted!");
+        loadMyPosts();
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
+/* ---------------- LIKES ---------------- */
+document.getElementById("load-likes").addEventListener("click", async () => {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch("http://localhost:3000/like-comment/user-likes", {
+        headers: { Authorization: `Bearer ${token}` },
     });
 
     const data = await res.json();
-console.log('data',data)
-    likesList.innerHTML = "";   // Clear previous items
 
-    if (data.likes.length === 0) {
-      likesList.innerHTML = "<li>No likes found</li>";
-      return;
+    likesList.innerHTML = "";
+    if (!data.likes?.length) {
+        likesList.innerHTML = "<li>No likes found</li>";
+        return;
     }
 
-    data.likes.forEach(item => {
-      const li = document.createElement('li');
-      li.textContent = item.title || `Post ID: ${item.postId}`;
-      likesList.appendChild(li);
-    });
+    document.getElementById("total-likes").textContent = data.likes.length;
 
-  } catch (err) {
-    console.log(err);
-  }
+    data.likes.forEach(post => {
+        const li = document.createElement("li");
+        li.textContent = post?.title || "Untitled Post";
+        likesList.appendChild(li);
+    });
 });
 
+/* ---------------- UNLIKES ---------------- */
+document.getElementById("load-unlikes").addEventListener("click", async () => {
+    const token = localStorage.getItem("token");
 
-// ⭐ Fetch All UnLikes
-document.getElementById('load-unlikes').addEventListener('click', async () => {
-  const token = localStorage.getItem('token');
-
-  try {
-    const res = await fetch('http://localhost:3000/like-comment/user-unlikes', {
-      method:'GET',
-      headers: { "Authorization": `Bearer ${token}` }
+    const res = await fetch("http://localhost:3000/like-comment/user-unlikes", {
+        headers: { Authorization: `Bearer ${token}` },
     });
 
     const data = await res.json();
 
-    unlikesList.innerHTML = ""; // Clear previous list
-console.log('data',data)
-    if (data.unlikes.length === 0) {
-      unlikesList.innerHTML = "<li>No unlikes found</li>";
-      return;
+    unlikesList.innerHTML = "";
+    if (!data.unlikes?.length) {
+        unlikesList.innerHTML = "<li>No unlikes found</li>";
+        return;
     }
 
-    data.unlikes.forEach(item => {
-      const li = document.createElement('li');
-      li.textContent = item.title || `Post ID: ${item.postId}`;
-      unlikesList.appendChild(li);
+    document.getElementById("total-unlikes").textContent = data.unlikes.length;
+
+    data.unlikes.forEach(post => {
+        const li = document.createElement("li");
+        li.textContent = post?.title || "Untitled Post";
+        unlikesList.appendChild(li);
+    });
+});
+
+/* ---------------- DELETE ACCOUNT ---------------- */
+document.getElementById("delete-account").addEventListener("click", async () => {
+    if (!confirm("Are you sure you want to delete your account permanently?"))
+        return;
+
+    const token = localStorage.getItem("token");
+
+    await fetch("http://localhost:3000/user/delete", {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
     });
 
-  } catch (err) {
-    console.log(err);
-  }
+    alert("Account deleted successfully");
+    localStorage.clear();
+    window.location.href = "./signup.html";
 });
+function closeEditForm() {
+    document.getElementById("edit-form-box").style.display = "none";
+}
+
+/* ---------------- LOGOUT ---------------- */
+document.getElementById("logout").addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location.href = "./login.html";
+});
+
+document.getElementById("back").addEventListener("click", () => {
+    window.location.href = "dashboard.html";
+});
+async function saveEditedPost() {
+    const postId = localStorage.getItem("editPostId");
+    const token = localStorage.getItem("token");
+
+    const title = document.getElementById("edit-title").value;
+    const description = document.getElementById("edit-description").value;
+    const category = document.getElementById("edit-category").value;
+    const imageFile = document.getElementById("edit-image").files[0];
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("category", category);
+
+    if (imageFile) {
+        formData.append("image", imageFile); // only when changed
+    }
+
+    const res = await fetch(`http://localhost:3000/post/update/${postId}`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+        alert(data.message || "Update failed");
+        return;
+    }
+
+    alert("Post updated!");
+    closeEditForm();
+    loadMyPosts();
+}
 
 </script>
 
-
-        </nav>
-    </div>
 </body>
 </html>
