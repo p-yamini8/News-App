@@ -4,34 +4,31 @@ const { Op } = require("sequelize");
 
 exports.addPost = async (req, res) => {
   try {
-    console.log("🟢 ADD POST CALLED");
     const { title, description, category } = req.body;
-    const image = req.file;
-  const userId = req.user?.id || req.body.userId || 1; // fallback to test user
 
-
-    console.log("📦 Data received =>", { title, description, category, image: image?.filename, userId });
-
-    if (!image || !title || !description || !category) {
-      console.log("❌ Missing fields");
+    if (!req.file || !title || !description || !category) {
       return res.status(400).json({ message: "Enter all details" });
     }
+console.log("FILE =", req.file);
 
-    const imagePath = "/" + image.path.replace(/\\/g, "/");
+    const imageUrl = req.file.location;
+    const userId = req.user?.id || req.body.userId || 1;
 
     const newPost = await Post.create({
-      image: imagePath,
+      image: imageUrl,
       title,
       description,
       category,
       userId,
     });
 
-    console.log("✅ SAVED POST:", newPost.dataValues);
+    return res.status(201).json({
+      message: "Post created successfully",
+      post: newPost,
+    });
 
-    return res.status(201).json({ message: "Post created successfully", post: newPost });
   } catch (err) {
-    console.error("❌ ERROR in addPost:", err);
+    console.error("ERROR in addPost:", err);
     return res.status(500).json({ message: "Server error", error: err.message });
   }
 };
@@ -123,7 +120,8 @@ exports.updatePost = async (req, res) => {
     let newImage = post.image;  // keep old image if not uploaded
 
     if (req.file) {
-      newImage = `/uploads/${req.file.filename}`;  // update new image
+    newImage = req.file.location;  
+
     }
 
     await post.update({

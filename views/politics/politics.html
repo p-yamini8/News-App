@@ -33,7 +33,12 @@ async function loadPoliticsPosts() {
       const postedTime = new Date(p.createdAt).toLocaleString();
 
       div.innerHTML = `
-        <img src="http://localhost:3000${p.image}" alt="Post Image">
+<img src="${
+  p.image.startsWith('http://') || p.image.startsWith('https://')
+    ? p.image
+    : `http://localhost:3000${p.image}`
+}" alt="Post Image">
+
         <div class="card-content">
           <h2>${p.title}</h2>
           <p>${p.description}</p>
