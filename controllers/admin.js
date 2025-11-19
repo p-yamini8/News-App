@@ -143,3 +143,22 @@ exports.updatePost = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+exports.deletePost=async(req,res)=>{
+  try{
+const {postId}=req.params;
+const post=await Post.findOne({where:{id:postId,userId:req.user.id}});
+if(!post)
+{
+  return res.status(404).json({message:'Post not found'});
+
+}
+await post.destroy();
+post.save();
+return res.satus(200).json({message:'post deleted successfully'})
+  }
+  catch(err)
+  {
+    console.log(err);
+    return res.status(500).json({message:'server error'})
+  }
+}

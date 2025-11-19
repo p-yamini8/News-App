@@ -86,13 +86,18 @@
         </div>
 
         <!-- User Posts -->
-        <div class="section-box">
-            <h3 onclick="toggleSection('myposts-section')">📝 Your Posts</h3>
-            <div id="myposts-section" class="hidden">
-                <div id="myposts-list"></div>
-                <button onclick="loadMyPosts()">Load Your Posts</button>
-            </div>
-        </div>
+      <div class="section-box">
+    <h3 onclick="toggleSection('myposts-section')">📝 Your Posts</h3>
+
+    <div class="scroll-box" id="myposts-section" class="hidden">
+
+        
+        <div id="myposts-list"></div>    <!-- Posts should appear here -->
+        
+
+        <button onclick="loadMyPosts()">Load Your Posts</button>
+    </div>
+</div>
 
         <!-- Likes -->
         <div class="section-box">
@@ -314,7 +319,7 @@ async function deletePost(postId) {
     try {
         const token = localStorage.getItem("token");
 
-        await fetch(`http://localhost:3000/posts/delete/${postId}`, {
+        await fetch(`http://localhost:3000/post/delete/${postId}`, {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` }
         });

@@ -20,4 +20,5 @@ router.get('/getPost',adminController.getPost);
 router.get('/my-posts',auth.authenticate,adminController.getMyPosts);
 router.get('/edit/:postId',auth.authenticate,adminController.editPost);
 router.put('/update/:postId',auth.authenticate,upload.single("image"),adminController.updatePost)
+router.delete('/delete/:postId',auth.authenticate,adminController.deletePost);
 module.exports=router;

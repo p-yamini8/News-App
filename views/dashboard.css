@@ -120,3 +120,12 @@ nav a:hover {
     opacity: 1;
   }
 }
+.scroll-box {
+    max-height: 300px;       /* Adjust height */
+    overflow-y: auto;        /* Vertical scrolling */
+    padding-right: 5px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    background: #d7cd0a;
+    border-radius: 8px;
+}
