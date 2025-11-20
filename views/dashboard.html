@@ -49,13 +49,13 @@
 </div>
 
 <nav>
-    <a href="./news/news.html">News</a>
+    <a href="dashboard.html">News</a>
     <a href="./politics/politics.html">Politics</a>
     <a href="./business/business.html">Business</a>
     <a href="./fun/fun.html">Fun</a>
     <a href="./sports/sports.html">Sports</a>
     <a href="./movies/movies.html">Movies</a>
-    <a href="admin.html">Admin</a>
+    <a href="admin.html">Post</a>
 
     <button id="account-btn">Account</button>
 
@@ -149,7 +149,7 @@
     <button onclick="saveEditedPost()" style="background:green; padding:8px 15px; border:none; color:white; border-radius:6px;">Save Changes</button>
     <button onclick="closeEditForm()" style="background:gray; padding:8px 15px; border:none; color:white; border-radius:6px;">Cancel</button>
 </div>
-
+  <div id="posts"></div>
 <script>
 
 /* ------------------ Toggle Sections ------------------- */
@@ -172,7 +172,171 @@ const myPostsList = document.getElementById('myposts-list');
 
 const accountBtn = document.getElementById('account-btn');
 const accountDetails = document.getElementById('account-details');
+async function loadAllPosts() {
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch('http://localhost:3000/post/getPost', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+if(!token)
+{
+    window.location.href='./login.html'
+}
+    if (!res.ok) throw new Error('Failed to fetch posts');
+    const posts = await res.json();
+    const postsDiv = document.getElementById('posts');
+    postsDiv.innerHTML = '';
 
+    for (const p of posts) {
+      const div = document.createElement('div');
+      div.classList.add('card');
+      div.dataset.postId = p.id;
+      const postedTime = new Date(p.createdAt).toLocaleString();
+
+      div.innerHTML = `
+      
+<img src="${
+  p.image.startsWith('http://') || p.image.startsWith('https://')
+    ? p.image
+    : `http://localhost:3000${p.image}`
+}" alt="Post Image">
+
+        <div class="card-content">
+          <h2>${p.title}</h2>
+          <p>${p.description}</p>
+          <div class="footer">
+            <span>🕒 ${postedTime}</span>
+            <span>By: ${p.user ? p.user.name : 'Unknown'}</span>
+          </div>
+          <div class="actions">
+            <button class="like-btn">❤️ Like (<span class="like-count">0</span>)</button>
+            <button class="dislike-btn">💔 Dislike (<span class="dislike-count">0</span>)</button>
+            <button class="comment-btn">💬 Comment</button>
+            <button class="share-btn">🔗 Share</button>
+          </div>
+          <div class="comment-list" style="display:none"></div>
+        </div>
+      `;
+
+      postsDiv.appendChild(div);
+
+      // --- Load like/dislike counts + user reaction ---
+      try {
+        const likeRes = await fetch(`http://localhost:3000/like-comment/likes/${p.id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const { likes, dislikes, userReaction } = await likeRes.json();
+        div.querySelector('.like-count').textContent = likes;
+        div.querySelector('.dislike-count').textContent = dislikes;
+
+        // Highlight user reaction
+        if (userReaction === 'like') div.querySelector('.like-btn').style.backgroundColor = 'green';
+        if (userReaction === 'dislike') div.querySelector('.dislike-btn').style.backgroundColor = 'red';
+      } catch (err) {
+        console.log('Error loading likes:', err);
+      }
+
+      // --- Like button ---
+      div.querySelector('.like-btn').addEventListener('click', async () => {
+        try {
+          const res = await fetch('http://localhost:3000/like-comment/like', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ postId: p.id, type: 'like' })
+          });
+          if (!res.ok) throw new Error('Failed to like');
+          await loadAllPosts(); // refresh UI state
+        } catch (err) {
+          console.error(err);
+          alert('Error liking post');
+        }
+      });
+
+      // --- Dislike button ---
+      div.querySelector('.dislike-btn').addEventListener('click', async () => {
+        try {
+          const res = await fetch('http://localhost:3000/like-comment/like', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ postId: p.id, type: 'dislike' })
+          });
+          if (!res.ok) throw new Error('Failed to dislike');
+          await loadAllPosts();
+        } catch (err) {
+          console.error(err);
+          alert('Error disliking post');
+        }
+      });
+
+      // --- Comment button ---
+      const commentBtn = div.querySelector('.comment-btn');
+      const commentList = div.querySelector('.comment-list');
+
+      commentBtn.addEventListener('click', async () => {
+        // Toggle visibility
+        if (commentList.style.display === 'none') {
+          commentList.style.display = 'block';
+          await loadComments(p.id, commentList, token);
+        } else {
+          commentList.style.display = 'none';
+        }
+      });
+
+      // --- Share button ---
+      div.querySelector('.share-btn').addEventListener('click', async () => {
+        const shareData = {
+          title: p.title,
+          text: p.description,
+          url: window.location.href
+        };
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+          } else {
+            await navigator.clipboard.writeText(shareData.url);
+            alert('Link copied to clipboard!');
+          }
+        } catch (err) {
+          console.log('Share failed:', err);
+        }
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Error loading posts');
+  }
+}
+
+
+//  async function loadAllPosts() {
+// //       try {
+// //         const res = await fetch('http://localhost:3000/post/getPost');
+
+// //         const posts = await res.json();
+// // console.log('posts',res.resuit,res.message)
+// //         const postsDiv = document.getElementById('posts');
+// //         posts.forEach(p => {
+// //           postsDiv.innerHTML += `
+// //             <div style="border:1px solid #aaa; padding:10px; margin:10px;">
+// //               <img src="${p.image}" width="120"><br>
+// //               ${p.title}</b>
+// //               <b>${p.category}</b>: ${p.description}
+// //             </div>
+// //           `;
+// //         });
+// //       } catch (err) {
+// //         console.log('Error fetching posts:', err);
+//     //   }
+    
+// }
+
+    loadAllPosts();
 /* Toggle account card */
 accountBtn.addEventListener('click', () => {
     accountDetails.style.display =

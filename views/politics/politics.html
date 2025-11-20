@@ -20,7 +20,10 @@ async function loadPoliticsPosts() {
     const res = await fetch('http://localhost:3000/post/getPost?category=Politics', {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-
+if(!token)
+{
+    window.location.href='../login.html'
+}
     if (!res.ok) throw new Error('Failed to fetch posts');
     const posts = await res.json();
     const postsDiv = document.getElementById('posts');
@@ -33,6 +36,7 @@ async function loadPoliticsPosts() {
       const postedTime = new Date(p.createdAt).toLocaleString();
 
       div.innerHTML = `
+      
 <img src="${
   p.image.startsWith('http://') || p.image.startsWith('https://')
     ? p.image

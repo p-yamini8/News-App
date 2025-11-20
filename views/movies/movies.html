@@ -12,11 +12,16 @@
   <div id="posts"></div>
 
   <script>
-
+ const token = localStorage.getItem('token');
+  if(!token)
+{
+    window.location.href='../login.html'
+}
 
 async function loadMoviesPosts() {
+  
   try {
-    const token = localStorage.getItem('token');
+   
     const res = await fetch('http://localhost:3000/post/getPost?category=Movies', {
       headers: { 'Authorization': `Bearer ${token}` }
     });

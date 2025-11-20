@@ -42,14 +42,14 @@ exports.getPost = async (req, res) => {
       ? { category: { [Op.like]: `%${category}%` } }
       : {};
 
-    console.log("🔍 Sequelize whereClause:", whereClause);
+    console.log(" Sequelize whereClause:", whereClause);
 
     const posts = await Post.findAll({
       where: whereClause,
       include: [{ model: User, as: "user", attributes: ["id", "name", "email"] }],
     });
 
-    console.log(`📦 ${posts.length} posts found`);
+    console.log(` ${posts.length} posts found`);
     if (posts.length > 0) console.log(posts.map((p) => p.dataValues));
 
     return res.status(200).json(posts);
