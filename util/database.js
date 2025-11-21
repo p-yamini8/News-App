@@ -22,7 +22,10 @@ const liveConfig = {
   port: process.env.LIVE_DB_PORT,
   dialect: "mysql",
   dialectOptions: {
-    ssl: { require: true, rejectUnauthorized: false }
+    ssl: { require: true, rejectUnauthorized: false, 
+      minVersion: "TLSv1.2",
+   
+     }
   }
 };
 
