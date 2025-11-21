@@ -24,7 +24,7 @@ const User=sequelize.define('User',{
 
 },{
   freezeTableName: true,
-  tableName: 'user',  // 👈 match the lowercase version already in DB
+  tableName: 'User',  // 👈 match the lowercase version already in DB
 })
 
 module.exports=User;

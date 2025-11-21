@@ -9,8 +9,9 @@ const adminRoutes=require('./routes/admin')
 const likeRoutes=require('./routes/like')
 const postRoutes=require('./routes/post')
 app.use(bodyParser.urlencoded({extended:false}));
-const { User, Post } = require('./models/associations');
+// const { User, Post } = require('./models/associations');
 
+require('./models/associations');
 
 app.use(express.json());
 app.use(cors());
@@ -32,11 +33,7 @@ sequelize.sync()
   .catch(err => console.error('❌ Sync error:', err));
 
 
-sequelize.sync().then(()=>{
-    console.log('connected');
-}).catch((err)=>{
-    console.log(err)
-})
-app.listen(3000,()=>{
+
+app.listen(process.env.PORT,()=>{
     console.log('running')
 })
