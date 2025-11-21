@@ -4,27 +4,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Politics News</title>
-    <link rel="stylesheet" href="./styles.css">
+      <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <h1>Politics News</h1>
   <a href="../dashboard.html">Back</a>
   <div id="posts"></div>
-
-  <script>
-
+  
+<script>
+const BASE = window.location.origin; // automatically uses localhost when local, your render domain when live
 
 async function loadPoliticsPosts() {
   try {
     const token = localStorage.getItem('token');
-    const res = await fetch('http://localhost:3000/post/getPost?category=Politics', {
+    if (!token) {
+      window.location.href = '../login.html';
+      return;
+    }
+
+    const res = await fetch(`${BASE}/post/getPost?category=Politics`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-if(!token)
-{
-    window.location.href='../login.html'
-}
-    if (!res.ok) throw new Error('Failed to fetch posts');
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch posts');
+    }
+
     const posts = await res.json();
     const postsDiv = document.getElementById('posts');
     postsDiv.innerHTML = '';
@@ -35,14 +40,13 @@ if(!token)
       div.dataset.postId = p.id;
       const postedTime = new Date(p.createdAt).toLocaleString();
 
-      div.innerHTML = `
-      
-<img src="${
-  p.image.startsWith('http://') || p.image.startsWith('https://')
-    ? p.image
-    : `http://localhost:3000${p.image}`
-}" alt="Post Image">
+      // build image url: use absolute if already absolute, otherwise use current origin
+      const imageUrl = (p.image && (p.image.startsWith('http://') || p.image.startsWith('https://')))
+        ? p.image
+        : `${BASE}${p.image || '/uploads/default.png'}`;
 
+      div.innerHTML = `
+        <img src="${imageUrl}" alt="Post Image">
         <div class="card-content">
           <h2>${p.title}</h2>
           <p>${p.description}</p>
@@ -63,25 +67,27 @@ if(!token)
       postsDiv.appendChild(div);
 
       // --- Load like/dislike counts + user reaction ---
-      try {
-        const likeRes = await fetch(`http://localhost:3000/like-comment/likes/${p.id}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const { likes, dislikes, userReaction } = await likeRes.json();
-        div.querySelector('.like-count').textContent = likes;
-        div.querySelector('.dislike-count').textContent = dislikes;
-
-        // Highlight user reaction
-        if (userReaction === 'like') div.querySelector('.like-btn').style.backgroundColor = 'green';
-        if (userReaction === 'dislike') div.querySelector('.dislike-btn').style.backgroundColor = 'red';
-      } catch (err) {
-        console.log('Error loading likes:', err);
-      }
+      (async () => {
+        try {
+          const likeRes = await fetch(`${BASE}/like-comment/likes/${p.id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (likeRes.ok) {
+            const { likes, dislikes, userReaction } = await likeRes.json();
+            div.querySelector('.like-count').textContent = likes ?? 0;
+            div.querySelector('.dislike-count').textContent = dislikes ?? 0;
+            if (userReaction === 'like') div.querySelector('.like-btn').style.backgroundColor = 'green';
+            if (userReaction === 'dislike') div.querySelector('.dislike-btn').style.backgroundColor = 'red';
+          }
+        } catch (err) {
+          console.log('Error loading likes:', err);
+        }
+      })();
 
       // --- Like button ---
       div.querySelector('.like-btn').addEventListener('click', async () => {
         try {
-          const res = await fetch('http://localhost:3000/like-comment/like', {
+          const res = await fetch(`${BASE}/like-comment/like`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -100,7 +106,7 @@ if(!token)
       // --- Dislike button ---
       div.querySelector('.dislike-btn').addEventListener('click', async () => {
         try {
-          const res = await fetch('http://localhost:3000/like-comment/like', {
+          const res = await fetch(`${BASE}/like-comment/like`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -121,7 +127,6 @@ if(!token)
       const commentList = div.querySelector('.comment-list');
 
       commentBtn.addEventListener('click', async () => {
-        // Toggle visibility
         if (commentList.style.display === 'none') {
           commentList.style.display = 'block';
           await loadComments(p.id, commentList, token);
@@ -155,12 +160,12 @@ if(!token)
   }
 }
 
-// --- Separate comment loader ---
 async function loadComments(postId, commentList, token) {
   try {
-    const res = await fetch(`http://localhost:3000/like-comment/comments/${postId}`, {
+    const res = await fetch(`${BASE}/like-comment/comments/${postId}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
+    if (!res.ok) return;
     const comments = await res.json();
     commentList.innerHTML = comments.map(c =>
       `<p><strong>${c.user?.name || 'User'}:</strong> ${c.comment}</p>`
@@ -174,11 +179,10 @@ async function loadComments(postId, commentList, token) {
     `;
     commentList.appendChild(addBox);
 
-    // Add event listener for adding comment
     document.getElementById(`addCommentBtn-${postId}`).addEventListener('click', async () => {
       const commentText = document.getElementById(`commentInput-${postId}`).value.trim();
       if (!commentText) return;
-      const res = await fetch('http://localhost:3000/like-comment/comment', {
+      const r = await fetch(`${BASE}/like-comment/comment`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -186,9 +190,7 @@ async function loadComments(postId, commentList, token) {
         },
         body: JSON.stringify({ postId, comment: commentText })
       });
-      if (res.ok) {
-        await loadComments(postId, commentList, token); // refresh comments
-      }
+      if (r.ok) await loadComments(postId, commentList, token);
     });
   } catch (err) {
     console.error('Error loading comments:', err);
@@ -196,7 +198,4 @@ async function loadComments(postId, commentList, token) {
 }
 
 loadPoliticsPosts();
-
-   </script>
-</body>
-</html>
+</script>
