@@ -63,7 +63,7 @@
         
         <h3>Your Account</h3>
 
-        <!-- Profile Image -->
+     <!-- Profile Image -->
         <img id="profile-img" src="./default-user.png" style="
             width:90px;height:90px;border-radius:50%;border:2px solid #444;margin-bottom:10px;">
         
@@ -76,7 +76,7 @@
 
         <hr>
 
-        <!-- Saved Posts Section -->
+       <!-- <-- Saved Posts Section-->
         <div class="section-box">
             <h3 onclick="toggleSection('saved-section')">📌 Saved Posts</h3>
             <div id="saved-section" class="hidden">
@@ -151,7 +151,7 @@
 </div>
   <div id="posts"></div>
 <script>
-
+const BASE = window.location.origin;
 /* ------------------ Toggle Sections ------------------- */
 function toggleSection(id) {
     const box = document.getElementById(id);
@@ -175,7 +175,7 @@ const accountDetails = document.getElementById('account-details');
 async function loadAllPosts() {
   try {
     const token = localStorage.getItem('token');
-    const res = await fetch('http://localhost:3000/post/getPost', {
+    const res = await fetch(`${BASE}/post/getPost`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
 if(!token)
@@ -198,7 +198,7 @@ if(!token)
 <img src="${
   p.image.startsWith('http://') || p.image.startsWith('https://')
     ? p.image
-    : `http://localhost:3000${p.image}`
+    : `${BASE}${p.image}`
 }" alt="Post Image">
 
         <div class="card-content">
@@ -222,7 +222,7 @@ if(!token)
 
       // --- Load like/dislike counts + user reaction ---
       try {
-        const likeRes = await fetch(`http://localhost:3000/like-comment/likes/${p.id}`, {
+        const likeRes = await fetch(`${BASE}/like-comment/likes/${p.id}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const { likes, dislikes, userReaction } = await likeRes.json();
@@ -239,7 +239,7 @@ if(!token)
       // --- Like button ---
       div.querySelector('.like-btn').addEventListener('click', async () => {
         try {
-          const res = await fetch('http://localhost:3000/like-comment/like', {
+          const res = await fetch(`${BASE}/like-comment/like`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -248,7 +248,23 @@ if(!token)
             body: JSON.stringify({ postId: p.id, type: 'like' })
           });
           if (!res.ok) throw new Error('Failed to like');
-          await loadAllPosts(); // refresh UI state
+          // Fetch updated like/dislike count for only this post
+    const lRes = await fetch(`${BASE}/like-comment/likes/${p.id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+      const { likes, dislikes, userReaction } = await lRes.json();
+
+    // Update UI for this post only
+    div.querySelector('.like-count').textContent = likes;
+    div.querySelector('.dislike-count').textContent = dislikes;
+
+    // Set button colors
+    div.querySelector('.like-btn').style.backgroundColor =
+      userReaction === "like" ? "green" : "";
+
+    div.querySelector('.dislike-btn').style.backgroundColor =
+      userReaction === "dislike" ? "red" : "";
+
         } catch (err) {
           console.error(err);
           alert('Error liking post');
@@ -258,7 +274,7 @@ if(!token)
       // --- Dislike button ---
       div.querySelector('.dislike-btn').addEventListener('click', async () => {
         try {
-          const res = await fetch('http://localhost:3000/like-comment/like', {
+          const res = await fetch(`${BASE}/like-comment/like`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -314,28 +330,6 @@ if(!token)
 }
 
 
-//  async function loadAllPosts() {
-// //       try {
-// //         const res = await fetch('http://localhost:3000/post/getPost');
-
-// //         const posts = await res.json();
-// // console.log('posts',res.resuit,res.message)
-// //         const postsDiv = document.getElementById('posts');
-// //         posts.forEach(p => {
-// //           postsDiv.innerHTML += `
-// //             <div style="border:1px solid #aaa; padding:10px; margin:10px;">
-// //               <img src="${p.image}" width="120"><br>
-// //               ${p.title}</b>
-// //               <b>${p.category}</b>: ${p.description}
-// //             </div>
-// //           `;
-// //         });
-// //       } catch (err) {
-// //         console.log('Error fetching posts:', err);
-//     //   }
-    
-// }
-
     loadAllPosts();
 /* Toggle account card */
 accountBtn.addEventListener('click', () => {
@@ -350,7 +344,7 @@ async function loadAccountDetails() {
         const token = localStorage.getItem('token');
         if (!token) return;
 
-        const res = await fetch("http://localhost:3000/user/profile", {
+        const res = await fetch(`${BASE}/user/profile`, {
             headers: { "Authorization": `Bearer ${token}` }
         });
 
@@ -376,7 +370,7 @@ async function loadSavedPosts() {
     try {
         const token = localStorage.getItem("token");
 
-        const res = await fetch("http://localhost:3000/posts/saved", {
+        const res = await fetch(`${BASE}/posts/saved`, {
             headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -409,7 +403,7 @@ async function loadMyPosts() {
         const userId = localStorage.getItem("userId");
         const role = localStorage.getItem("role");
 
-        const res = await fetch("http://localhost:3000/post/my-posts", {
+        const res = await fetch(`${BASE}/post/my-posts`, {
             method:'GET',
             headers: { Authorization: `Bearer ${token}` },
         });
@@ -447,7 +441,7 @@ async function editPost(postId) {
     try {document.getElementById("edit-form-box").style.display = "block";
         const token = localStorage.getItem("token");
 
-        const res = await fetch(`http://localhost:3000/post/edit/${postId}`, {
+        const res = await fetch(`${BASE}/post/edit/${postId}`, {
             method: "GET",
             headers: { Authorization: `Bearer ${token}` },
         });
@@ -483,7 +477,7 @@ async function deletePost(postId) {
     try {
         const token = localStorage.getItem("token");
 
-        await fetch(`http://localhost:3000/post/delete/${postId}`, {
+        await fetch(`${BASE}/post/delete/${postId}`, {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` }
         });
@@ -501,7 +495,7 @@ async function deletePost(postId) {
 document.getElementById("load-likes").addEventListener("click", async () => {
     const token = localStorage.getItem("token");
 
-    const res = await fetch("http://localhost:3000/like-comment/user-likes", {
+    const res = await fetch(`${BASE}/like-comment/user-likes`, {
         headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -526,7 +520,7 @@ document.getElementById("load-likes").addEventListener("click", async () => {
 document.getElementById("load-unlikes").addEventListener("click", async () => {
     const token = localStorage.getItem("token");
 
-    const res = await fetch("http://localhost:3000/like-comment/user-unlikes", {
+    const res = await fetch(`${BASE}/like-comment/user-unlikes`, {
         headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -554,7 +548,7 @@ document.getElementById("delete-account").addEventListener("click", async () => 
 
     const token = localStorage.getItem("token");
 
-    await fetch("http://localhost:3000/user/delete", {
+    await fetch(`${BASE}/user/delete`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
     });
@@ -594,7 +588,7 @@ async function saveEditedPost() {
         formData.append("image", imageFile); // only when changed
     }
 
-    const res = await fetch(`http://localhost:3000/post/update/${postId}`, {
+    const res = await fetch(`${BASE}/post/update/${postId}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
         body: formData
@@ -615,4 +609,4 @@ async function saveEditedPost() {
 </script>
 
 </body>
-</html>
+</html> -->

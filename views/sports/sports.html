@@ -12,7 +12,7 @@
   <div id="posts"></div>
 
   <script>
-
+const BASE = window.location.origin;
 
 async function loadSportsPosts() {
   try {
@@ -22,7 +22,7 @@ async function loadSportsPosts() {
     window.location.href='../login.html'
 }
 
-    const res = await fetch('http://localhost:3000/post/getPost?category=sports', {
+    const res = await fetch(`${BASE}/post/getPost?category=sports`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
 
@@ -41,7 +41,7 @@ async function loadSportsPosts() {
         <img src="${
   p.image.startsWith('http://') || p.image.startsWith('https://')
     ? p.image
-    : `http://localhost:3000${p.image}`
+    : `${BASE}${p.image}`
 }" alt="Post Image">
         <div class="card-content">
           <h2>${p.title}</h2>
@@ -64,7 +64,7 @@ async function loadSportsPosts() {
 
       // --- Load like/dislike counts + user reaction ---
       try {
-        const likeRes = await fetch(`http://localhost:3000/like-comment/likes/${p.id}`, {
+        const likeRes = await fetch(`${BASE}/like-comment/likes/${p.id}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const { likes, dislikes, userReaction } = await likeRes.json();
@@ -81,7 +81,7 @@ async function loadSportsPosts() {
       // --- Like button ---
       div.querySelector('.like-btn').addEventListener('click', async () => {
         try {
-          const res = await fetch('http://localhost:3000/like-comment/like', {
+          const res = await fetch(`${BASE}/like-comment/like`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -100,7 +100,7 @@ async function loadSportsPosts() {
       // --- Dislike button ---
       div.querySelector('.dislike-btn').addEventListener('click', async () => {
         try {
-          const res = await fetch('http://localhost:3000/like-comment/like', {
+          const res = await fetch(`${BASE}/like-comment/like`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -158,7 +158,7 @@ async function loadSportsPosts() {
 // --- Separate comment loader ---
 async function loadComments(postId, commentList, token) {
   try {
-    const res = await fetch(`http://localhost:3000/like-comment/comments/${postId}`, {
+    const res = await fetch(`${BASE}/like-comment/comments/${postId}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const comments = await res.json();
@@ -178,7 +178,7 @@ async function loadComments(postId, commentList, token) {
     document.getElementById(`addCommentBtn-${postId}`).addEventListener('click', async () => {
       const commentText = document.getElementById(`commentInput-${postId}`).value.trim();
       if (!commentText) return;
-      const res = await fetch('http://localhost:3000/like-comment/comment', {
+      const res = await fetch(`${BASE}/like-comment/comment`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

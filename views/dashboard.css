@@ -4,7 +4,10 @@ body {
   padding: 0;
   font-family: "Poppins", sans-serif;
   background: #f7f8fc;
+   position: relative;
+  overflow-x: hidden;
 }
+
 
 /* Header */
 #head {
@@ -121,11 +124,25 @@ nav a:hover {
   }
 }
 .scroll-box {
-    max-height: 300px;       /* Adjust height */
-    overflow-y: auto;        /* Vertical scrolling */
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
     padding-right: 5px;
     margin-top: 10px;
     border: 1px solid #ccc;
     background: #d7cd0a;
     border-radius: 8px;
+}
+
+
+
+.card {
+    width: 100%;
+    max-width: 100%;
+    margin: 10px auto;
+    background: white;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;   
 }
