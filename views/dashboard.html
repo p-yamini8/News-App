@@ -201,7 +201,7 @@ if(!token)
   p.image.startsWith('http://') || p.image.startsWith('https://')
     ? p.image
     : `${BASE}${p.image}`
-}" alt="Post Image">
+}" alt="Post Image" class="post-image">
 
         <div class="card-content">
           <h2>${p.title}</h2>
@@ -384,41 +384,6 @@ async function loadAccountDetails() {
     }
 }
 
-async function loadSavedPosts() {
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch(`${BASE}/post/saved`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    const data = await res.json();
-    const savedPosts = data.posts;
-
-    const container = document.getElementById("saved-Posts");
-    container.innerHTML = "";
-
-    if (!savedPosts || savedPosts.length === 0) {
-      container.innerHTML = "<h3>No saved posts found</h3>";
-      return;
-    }
-
-    savedPosts.forEach((p) => {
-      container.innerHTML += `
-        <div class="post-card">
-           
-            <h3>${p.title}</h3>
-            <p>${p.description}</p>
-        </div>
-      `;
-    });
-
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-loadSavedPosts();
 
 
 
@@ -568,6 +533,42 @@ document.getElementById("load-unlikes").addEventListener("click", async () => {
     });
 });
 
+async function loadComments(postId, commentList, token) {
+  try {
+    const res = await fetch(`${BASE}/like-comment/comments/${postId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) return;
+    const comments = await res.json();
+    commentList.innerHTML = comments.map(c =>
+      `<p><strong>${c.user?.name || 'User'}:</strong> ${c.comment}</p>`
+    ).join('');
+
+    // Add comment box
+    const addBox = document.createElement('div');
+    addBox.innerHTML = `
+      <input type="text" placeholder="Write a comment..." id="commentInput-${postId}" style="width:70%">
+      <button id="addCommentBtn-${postId}">Post</button>
+    `;
+    commentList.appendChild(addBox);
+
+    document.getElementById(`addCommentBtn-${postId}`).addEventListener('click', async () => {
+      const commentText = document.getElementById(`commentInput-${postId}`).value.trim();
+      if (!commentText) return;
+      const r = await fetch(`${BASE}/like-comment/comment`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ postId, comment: commentText })
+      });
+      if (r.ok) await loadComments(postId, commentList, token);
+    });
+  } catch (err) {
+    console.error('Error loading comments:', err);
+  }
+}
 /* ---------------- DELETE ACCOUNT ---------------- */
 document.getElementById("delete-account").addEventListener("click", async () => {
     
@@ -711,6 +712,41 @@ async function checkSaveStatus(postId) {
 
 
 
+async function loadSavedPosts() {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`${BASE}/post/saved`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const data = await res.json();
+    const savedPosts = data.posts;
+
+    const container = document.getElementById("saved-Posts");
+    container.innerHTML = "";
+
+    if (!savedPosts || savedPosts.length === 0) {
+      container.innerHTML = "<h3>No saved posts found</h3>";
+      return;
+    }
+
+    savedPosts.forEach((p) => {
+      container.innerHTML += `
+        <div class="post-card">
+           
+            <h3>${p.title}</h3>
+            <p>${p.description}</p>
+        </div>
+      `;
+    });
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+loadSavedPosts();
 
 </script>
 

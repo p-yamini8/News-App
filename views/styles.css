@@ -123,3 +123,9 @@ button:hover {
 .comment-post-btn {
   background: #ff2e76;
 }
+.post-image {
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain;  /* Full image, no crop */
+  background-color: #000; /* optional */
+}

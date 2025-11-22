@@ -42,7 +42,7 @@ async function loadFunPosts() {
   p.image.startsWith('http://') || p.image.startsWith('https://')
     ? p.image
     : `${BASE}${p.image}`
-}" alt="Post Image">
+}" alt="Post Image" class="post-image">
         <div class="card-content">
           <h2>${p.title}</h2>
           <p>${p.description}</p>
@@ -53,6 +53,7 @@ async function loadFunPosts() {
           <div class="actions">
             <button class="like-btn">❤️ Like (<span class="like-count">0</span>)</button>
             <button class="dislike-btn">💔 Dislike (<span class="dislike-count">0</span>)</button>
+            <button class="save-btn" id="save-${p.id}" data-saved="false"  onclick="savePost(${p.id})"> Save</button>
             <button class="comment-btn">💬 Comment</button>
             <button class="share-btn">🔗 Share</button>
           </div>
@@ -196,7 +197,110 @@ async function loadComments(postId, commentList, token) {
 }
 
 loadFunPosts();
+async function savePost(postId) {
+  try {
+    const token = localStorage.getItem("token");
 
+    // select correct button
+    const btn = document.querySelector(`#save-${postId}`);
+
+    // check current state
+    const isSaved = btn.getAttribute("data-saved") === "true";
+
+    // decide next action
+    const action = isSaved ? "unsave" : "save";
+
+    const res = await fetch(`${BASE}/post/save/${postId}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ type: action })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      if (data.type === "save") {
+        btn.style.backgroundColor = "white";
+        btn.textContent = "Saved";
+        btn.setAttribute("data-saved", "true");
+      } else {
+        btn.style.backgroundColor = "transparent";
+        btn.textContent = "Save";
+        btn.setAttribute("data-saved", "false");
+      }
+    }
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+async function checkSaveStatus(postId) {
+  const token = localStorage.getItem("token");
+  const btn = document.querySelector(`#save-${postId}`);
+
+  try {
+    const res = await fetch(`${BASE}/post/save/${postId}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const data = await res.json();
+
+    if (data.isSaved) {
+      btn.style.backgroundColor = "white";
+      btn.textContent = "Saved";
+      btn.setAttribute("data-saved", "true");
+    } else {
+      btn.style.backgroundColor = "transparent";
+      btn.textContent = "Save";
+      btn.setAttribute("data-saved", "false");
+    }
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+
+
+async function loadSavedPosts() {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`${BASE}/post/saved`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const data = await res.json();
+    const savedPosts = data.posts;
+
+    const container = document.getElementById("saved-Posts");
+    container.innerHTML = "";
+
+    if (!savedPosts || savedPosts.length === 0) {
+      container.innerHTML = "<h3>No saved posts found</h3>";
+      return;
+    }
+
+    savedPosts.forEach((p) => {
+      container.innerHTML += `
+        <div class="post-card">
+           
+            <h3>${p.title}</h3>
+            <p>${p.description}</p>
+        </div>
+      `;
+    });
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+loadSavedPosts();
    </script>
 </body>
 </html>

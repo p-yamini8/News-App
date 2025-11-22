@@ -146,3 +146,33 @@ nav a:hover {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     overflow: hidden;   
 }
+#account-details {
+    max-height: 500px;   /* Adjust height as needed */
+    overflow-y: auto;    /* Enable vertical scroll */
+    padding-right: 10px; /* Space for scrollbar */
+}
+
+/* Optional: Beautiful scrollbar (Chrome only) */
+#account-details::-webkit-scrollbar {
+    width: 8px;
+}
+
+#account-details::-webkit-scrollbar-track {
+    background: #eee;
+    border-radius: 10px;
+}
+
+#account-details::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+#account-details::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+.post-image {
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain;  /* Full image, no crop */
+  background-color: #000; /* optional */
+}
