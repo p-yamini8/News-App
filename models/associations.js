@@ -2,7 +2,7 @@ const User = require('./user');
 const Post = require('./post');
 const Like = require('./like');
 const Comment = require('./comment');
-
+const Save=require('./save')
 // ----- Posts -----
 User.hasMany(Post, { foreignKey: 'userId', as: 'posts' });
 Post.belongsTo(User, { foreignKey: 'userId', as: 'user' });
@@ -21,4 +21,10 @@ Comment.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 Post.hasMany(Comment, { foreignKey: 'postId', as: 'comments' });
 Comment.belongsTo(Post, { foreignKey: 'postId', as: 'post' });
 
-module.exports = { User, Post, Like, Comment };
+User.hasMany(Save, { foreignKey: 'userId', as: 'saves' });
+Save.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+Post.hasMany(Save, { foreignKey: 'postId', as: 'saves' });
+Save.belongsTo(Post, { foreignKey: 'postId', as: 'post' });
+
+module.exports = { User, Post, Like, Comment,Save};

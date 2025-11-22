@@ -21,4 +21,11 @@ router.get('/my-posts',auth.authenticate,adminController.getMyPosts);
 router.get('/edit/:postId',auth.authenticate,adminController.editPost);
 router.put('/update/:postId',auth.authenticate,upload.single("image"),adminController.updatePost)
 router.delete('/delete/:postId',auth.authenticate,adminController.deletePost);
+router.post('/save/:postId', auth.authenticate, adminController.savePost);
+
+// Get save status for a single post (frontend's checkSaveStatus) - returns { isSaved, type }
+router.get('/save/:postId', auth.authenticate, adminController.getSaveStatus);
+
+// Get all saved posts for the authenticated user (frontend called /posts/saved)
+router.get('/saved', auth.authenticate, adminController.getSavedPosts);
 module.exports=router;

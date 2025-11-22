@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const Post=require('../models/post');
 const bcrypt = require('bcrypt');
 const jwt=require('jsonwebtoken');
 const dotenv=require('dotenv');
@@ -89,3 +90,19 @@ exports.getProfile=async(req,res)=>{
     res.status(500).json({ message: 'Server error' });
   }
 }
+
+exports.deleteAccount = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        // Delete user expenses before deleting the user (if required)
+        await Post.destroy({ where: { userId } });
+
+        // Delete user record
+        await User.destroy({ where: { id: userId } });
+
+        res.status(200).json({ message: "Account deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ message: "Error deleting account", error: err });
+    }
+};

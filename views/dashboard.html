@@ -59,11 +59,12 @@
 
     <button id="account-btn">Account</button>
 
-    <div id="account-details" style="display: none; margin-top:15px;">
+   <div id="account-details" style="display: none; margin-top:15px; max-height:500px; overflow-y:auto;">
+
         
         <h3>Your Account</h3>
 
-     <!-- Profile Image -->
+     Profile Image
         <img id="profile-img" src="./default-user.png" style="
             width:90px;height:90px;border-radius:50%;border:2px solid #444;margin-bottom:10px;">
         
@@ -76,12 +77,13 @@
 
         <hr>
 
-       <!-- <-- Saved Posts Section-->
+        <!-- Saved Posts Section-->
         <div class="section-box">
             <h3 onclick="toggleSection('saved-section')">📌 Saved Posts</h3>
             <div id="saved-section" class="hidden">
                 <ol id="saved-list"></ol>
                 <button onclick="loadSavedPosts()">Load Saved Posts</button>
+                <ol id="saved-Posts"></ol>
             </div>
         </div>
 
@@ -101,7 +103,7 @@
 
         <!-- Likes -->
         <div class="section-box">
-            <h3 onclick="toggleSection('likes-section')">❤️ Likes</h3>
+            <h3 onclick="toggleSection('likes-section')">❤ Likes</h3>
             <div id="likes-section" class="hidden">
                 <p>Total Likes: <span id="total-likes">0</span></p>
                 <ol id="likes-list"></ol>
@@ -152,13 +154,13 @@
   <div id="posts"></div>
 <script>
 const BASE = window.location.origin;
-/* ------------------ Toggle Sections ------------------- */
+// Toggle Sections
 function toggleSection(id) {
     const box = document.getElementById(id);
     box.classList.toggle("hidden");
 }
 
-/* ---------------- PROFILE INFO ---------------- */
+// PROFILE INFO 
 const nameSpan = document.getElementById('acc-name');
 const emailSpan = document.getElementById('acc-email');
 const planSpan = document.getElementById('acc-plan');
@@ -209,8 +211,11 @@ if(!token)
             <span>By: ${p.user ? p.user.name : 'Unknown'}</span>
           </div>
           <div class="actions">
-            <button class="like-btn">❤️ Like (<span class="like-count">0</span>)</button>
+            <button class="like-btn">❤ Like (<span class="like-count">0</span>)</button>
             <button class="dislike-btn">💔 Dislike (<span class="dislike-count">0</span>)</button>
+           <button 
+  class="save-btn" id="save-${p.id}" data-saved="false"  onclick="savePost(${p.id})"> Save</button>
+
             <button class="comment-btn">💬 Comment</button>
             <button class="share-btn">🔗 Share</button>
           </div>
@@ -219,7 +224,7 @@ if(!token)
       `;
 
       postsDiv.appendChild(div);
-
+ checkSaveStatus(p.id);
       // --- Load like/dislike counts + user reaction ---
       try {
         const likeRes = await fetch(`${BASE}/like-comment/likes/${p.id}`, {
@@ -250,7 +255,7 @@ if(!token)
           if (!res.ok) throw new Error('Failed to like');
           // Fetch updated like/dislike count for only this post
     const lRes = await fetch(`${BASE}/like-comment/likes/${p.id}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { 'Authorization':`Bearer ${token}` }
     });
       const { likes, dislikes, userReaction } = await lRes.json();
 
@@ -283,7 +288,21 @@ if(!token)
             body: JSON.stringify({ postId: p.id, type: 'dislike' })
           });
           if (!res.ok) throw new Error('Failed to dislike');
-          await loadAllPosts();
+        const lRes = await fetch(`${BASE}/like-comment/likes/${p.id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+      const { likes, dislikes, userReaction } = await lRes.json();
+
+    // Update UI for this post only
+    div.querySelector('.like-count').textContent = likes;
+    div.querySelector('.dislike-count').textContent = dislikes;
+
+    // Set button colors
+    div.querySelector('.like-btn').style.backgroundColor =
+      userReaction === "like" ? "green" : "";
+
+    div.querySelector('.dislike-btn').style.backgroundColor =
+      userReaction === "dislike" ? "red" : "";
         } catch (err) {
           console.error(err);
           alert('Error disliking post');
@@ -365,34 +384,42 @@ async function loadAccountDetails() {
     }
 }
 
-/* ---------------- SAVED POSTS ---------------- */
 async function loadSavedPosts() {
-    try {
-        const token = localStorage.getItem("token");
+  try {
+    const token = localStorage.getItem("token");
 
-        const res = await fetch(`${BASE}/posts/saved`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
+    const res = await fetch(`${BASE}/post/saved`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
 
-        const data = await res.json();
+    const data = await res.json();
+    const savedPosts = data.posts;
 
-        savedList.innerHTML = "";
+    const container = document.getElementById("saved-Posts");
+    container.innerHTML = "";
 
-        if (!data.posts?.length) {
-            savedList.innerHTML = "<li>No saved posts found</li>";
-            return;
-        }
-
-        data.posts.forEach(post => {
-            const li = document.createElement("li");
-            li.textContent = post.title;
-            savedList.appendChild(li);
-        });
-
-    } catch (err) {
-        console.log(err);
+    if (!savedPosts || savedPosts.length === 0) {
+      container.innerHTML = "<h3>No saved posts found</h3>";
+      return;
     }
+
+    savedPosts.forEach((p) => {
+      container.innerHTML += `
+        <div class="post-card">
+           
+            <h3>${p.title}</h3>
+            <p>${p.description}</p>
+        </div>
+      `;
+    });
+
+  } catch (err) {
+    console.log(err);
+  }
 }
+
+loadSavedPosts();
+
 
 
 /* ---------------- YOUR POSTS ---------------- */
@@ -543,19 +570,27 @@ document.getElementById("load-unlikes").addEventListener("click", async () => {
 
 /* ---------------- DELETE ACCOUNT ---------------- */
 document.getElementById("delete-account").addEventListener("click", async () => {
-    if (!confirm("Are you sure you want to delete your account permanently?"))
-        return;
+    
+    if (!confirm("Are you sure? This action cannot be undone.")) return;
 
     const token = localStorage.getItem("token");
 
-    await fetch(`${BASE}/user/delete`, {
+    const res = await fetch(`${BASE}/user/delete-account`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
     });
 
-    alert("Account deleted successfully");
-    localStorage.clear();
-    window.location.href = "./signup.html";
+    const data = await res.json();
+
+    if (res.ok) {
+        alert("Your account has been deleted.");
+        localStorage.removeItem("token");
+        window.location.href = "./signup.html";   // redirect
+    } else {
+        alert("Error deleting account: " + data.message);
+    }
 });
 function closeEditForm() {
     document.getElementById("edit-form-box").style.display = "none";
@@ -590,7 +625,9 @@ async function saveEditedPost() {
 
     const res = await fetch(`${BASE}/post/update/${postId}`, {
         method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+ },
         body: formData
     });
 
@@ -605,8 +642,77 @@ async function saveEditedPost() {
     closeEditForm();
     loadMyPosts();
 }
+async function savePost(postId) {
+  try {
+    const token = localStorage.getItem("token");
+
+    // select correct button
+    const btn = document.querySelector(`#save-${postId}`);
+
+    // check current state
+    const isSaved = btn.getAttribute("data-saved") === "true";
+
+    // decide next action
+    const action = isSaved ? "unsave" : "save";
+
+    const res = await fetch(`${BASE}/post/save/${postId}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ type: action })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      if (data.type === "save") {
+        btn.style.backgroundColor = "white";
+        btn.textContent = "Saved";
+        btn.setAttribute("data-saved", "true");
+      } else {
+        btn.style.backgroundColor = "transparent";
+        btn.textContent = "Save";
+        btn.setAttribute("data-saved", "false");
+      }
+    }
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+async function checkSaveStatus(postId) {
+  const token = localStorage.getItem("token");
+  const btn = document.querySelector(`#save-${postId}`);
+
+  try {
+    const res = await fetch(`${BASE}/post/save/${postId}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const data = await res.json();
+
+    if (data.isSaved) {
+      btn.style.backgroundColor = "white";
+      btn.textContent = "Saved";
+      btn.setAttribute("data-saved", "true");
+    } else {
+      btn.style.backgroundColor = "transparent";
+      btn.textContent = "Save";
+      btn.setAttribute("data-saved", "false");
+    }
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+
+
 
 </script>
 
 </body>
-</html> -->
+</html> 

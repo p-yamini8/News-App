@@ -1,5 +1,6 @@
 const Post = require("../models/post");
 const User = require("../models/user");
+const Save=require('../models/save');
 const { Op } = require("sequelize");
 
 exports.addPost = async (req, res) => {
@@ -160,3 +161,87 @@ return res.satus(200).json({message:'post deleted successfully'})
     return res.status(500).json({message:'server error'})
   }
 }
+// Toggle Save / Unsave
+exports.savePost = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { postId } = req.params;
+    const { type } = req.body;  // expected "save" or "unsave"
+
+    if (!['save', 'unsave'].includes(type)) {
+      return res.status(400).json({ message: "Invalid type. Use 'save' or 'unsave'." });
+    }
+
+    // Find existing save record for this user & post
+    let saveRecord = await Save.findOne({ where: { userId, postId } });
+
+    if (saveRecord) {
+      // Update existing
+      saveRecord.type = type;
+      await saveRecord.save();
+    } else {
+      // Create new record (type will be 'save' or 'unsave')
+      saveRecord = await Save.create({ userId, postId, type });
+    }
+
+    // Optionally: if you prefer to delete 'unsave' records instead of storing them, you could:
+    // if (type === 'unsave') { await saveRecord.destroy(); return res.json({ message: 'unsaved', type: 'unsave' }); }
+
+    return res.status(200).json({ message: 'Success', type: saveRecord.type });
+  } catch (err) {
+    console.error("savePost error:", err);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// Get save status for a single post (used by checkSaveStatus on frontend)
+exports.getSaveStatus = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { postId } = req.params;
+
+    const saveRecord = await Save.findOne({ where: { userId, postId } });
+
+    const isSaved = !!(saveRecord && saveRecord.type === 'save');
+
+    return res.status(200).json({
+      isSaved,
+      type: saveRecord ? saveRecord.type : 'unsave'
+    });
+  } catch (err) {
+    console.error("getSaveStatus error:", err);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// Get all saved posts for the authenticated user
+exports.getSavedPosts = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // find all Save rows where user saved posts (type === 'save') and include Post
+    const savedRows = await Save.findAll({
+      where: { userId, type: 'save' },
+      include: [
+        {
+          model: Post,
+          as: 'post',
+          include: [
+            { model: User, as: 'user', attributes: ['id', 'name', 'email'] }
+          ]
+        }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+
+    // map to posts array (some saves may lack post if deleted)
+    const posts = savedRows
+      .map(r => r.post)
+      .filter(Boolean); // remove nulls
+
+    return res.status(200).json({ posts });
+  } catch (err) {
+    console.error("getSavedPosts error:", err);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
