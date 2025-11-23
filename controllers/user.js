@@ -34,7 +34,7 @@ console.log(name,email,password)
 
   } catch (err) {
     console.error('Signup error:', err);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Internal server error',err });
   }
 };
 
