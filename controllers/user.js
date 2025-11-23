@@ -106,3 +106,44 @@ exports.deleteAccount = async (req, res) => {
         res.status(500).json({ message: "Error deleting account", error: err });
     }
 };
+exports.editProfile=async(req,res)=>{
+  try{
+    const {name,email}=req.body;
+    const userId=req.user.id;
+    console.log(name,email,userId);
+    const user=await User.findOne({where:{id:userId}})
+    if(!user)
+    {
+      return res.status(404).json({message:'User not found'});
+    }
+   await user.update({name,email});
+   
+   return res.status(200).json({message:'edit-profile successfully'});
+  }
+  catch(err)
+  {
+    return res.status(500).json({message:'server error',err});
+  }
+}
+
+// GET USER PROFILE FOR EDITING
+exports.getEditProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const user = await User.findOne({ where: { id: userId } });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      name: user.name,
+      email: user.email,
+      profilePic: user.profilePic || null
+    });
+
+  } catch (err) {
+    return res.status(500).json({ message: "Server error", error: err });
+  }
+};

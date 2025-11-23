@@ -58,24 +58,21 @@
     <a href="admin.html">Post</a>
 
     <button id="account-btn">Account</button>
+    </nav>
 
    <div id="account-details" style="display: none; margin-top:15px; max-height:500px; overflow-y:auto;">
-
+ 
         
         <h3>Your Account</h3>
-
      Profile Image
         <img id="profile-img" src="./default-user.png" style="
             width:90px;height:90px;border-radius:50%;border:2px solid #444;margin-bottom:10px;">
         
-        <button id="edit-profile-btn">Edit Profile</button>
-
         <p><strong>Name:</strong> <span id="acc-name"></span></p>
         <p><strong>Email:</strong> <span id="acc-email"></span></p>
-        <p><strong>Plan:</strong> <span id="acc-plan"></span></p>
         <p><strong>Last Login:</strong> <span id="last-login"></span></p>
-
-        <hr>
+         <button id="edit-profile-btn">Edit Profile</button>
+         <hr>
 
         <!-- Saved Posts Section-->
         <div class="section-box">
@@ -131,7 +128,13 @@
         <button id="logout">Logout</button>
 
     </div>
-</nav>
+
+<div id="edit-profile" style="display: none;">
+    Name:<input type="text" id="edit-name" placeholder="Enter Your Name">
+    email:<input type="email"id='edit-email' placeholder="Enter Your Email">
+   <button id="submit-profile-btn">Submit</button>
+    <button id="cancel-btn">Cancel</button>
+  </div>
 <!-- EDIT POST FORM (HIDDEN INITIALLY) -->
 <div id="edit-form-box" style="display:none; margin:20px; padding:15px; border:1px solid #ccc; border-radius:10px; background:#fff;">
     <h3>Edit Post</h3>
@@ -152,6 +155,7 @@
     <button onclick="closeEditForm()" style="background:gray; padding:8px 15px; border:none; color:white; border-radius:6px;">Cancel</button>
 </div>
   <div id="posts"></div>
+ 
 <script>
 const BASE = window.location.origin;
 // Toggle Sections
@@ -163,22 +167,88 @@ function toggleSection(id) {
 // PROFILE INFO 
 const nameSpan = document.getElementById('acc-name');
 const emailSpan = document.getElementById('acc-email');
-const planSpan = document.getElementById('acc-plan');
 const lastLoginSpan = document.getElementById('last-login');
 const profileImg = document.getElementById('profile-img');
-
+const editProfilebtn=document.getElementById("edit-profile-btn");
 const likesList = document.getElementById('likes-list');
 const unlikesList = document.getElementById('unlikes-list');
 const savedList = document.getElementById('saved-list');
 const myPostsList = document.getElementById('myposts-list');
-
+const submiteditProfile = document.getElementById("submit-profile-btn");
 const accountBtn = document.getElementById('account-btn');
 const accountDetails = document.getElementById('account-details');
+editProfilebtn.addEventListener('click',async(e)=>{
+  e.preventDefault();
+  document.getElementById('edit-profile').style.display = 'block';
+});
+submiteditProfile.addEventListener('click',async(e)=>{
+  e.preventDefault();
+try{
+  
+  const name=document.getElementById('edit-name').value;
+  const email=document.getElementById('edit-email').value;
+
+    const token=localStorage.getItem('token')
+const res=await fetch(`${BASE}/user/edit-profile`,{
+  method:'POST',
+headers: {'Authorization': `Bearer ${token}`,
+'Content-Type':'application/json'},
+body:JSON.stringify({name,email}),
+});
+
+const data=await res.json();
+if(!res.ok)
+{
+  alert('unable to edit')
+}
+else {
+   document.getElementById('edit-profile').style.display = 'none';
+    document.getElementById('account-details').style.display = "none";
+     document.getElementById('acc-name').textContent = data.user.name;
+    document.getElementById('acc-email').textContent = data.user.email;
+
+    alert('Profile updated successfully!');
+    }
+
+  }
+  catch(err)
+  {
+    console.log('err',err);
+  }
+})
+editProfilebtn.addEventListener("click", async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`${BASE}/user/edit-profile`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      // Prefill form fields
+      document.getElementById("edit-name").value = data.name;
+      document.getElementById("edit-email").value = data.email;
+
+      document.getElementById("edit-profile").style.display = "block";
+    } else {
+      alert("Unable to load profile details");
+    }
+
+  } catch (err) {
+    console.log("Error:", err);
+  }
+});
+
+
+
 async function loadAllPosts() {
   try {
     const token = localStorage.getItem('token');
     const res = await fetch(`${BASE}/post/getPost`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: {'Authorization': `Bearer ${token}` }
     });
 if(!token)
 {
@@ -351,10 +421,18 @@ if(!token)
 
     loadAllPosts();
 /* Toggle account card */
-accountBtn.addEventListener('click', () => {
-    accountDetails.style.display =
-        accountDetails.style.display === 'none' ? 'block' : 'none';
+
+   accountBtn.addEventListener("click", async(e) => {
+    alert('123')
+    e.preventDefault();
+  if (accountDetails.style.display === "none" || accountDetails.style.display === "") {
+    accountDetails.style.display = "block";
     loadAccountDetails();
+  } else {
+    accountDetails.style.display = "none";
+  }
+
+
 });
 
 /* Load Profile */
@@ -371,7 +449,6 @@ async function loadAccountDetails() {
 
         nameSpan.textContent = user.name;
         emailSpan.textContent = user.email;
-        planSpan.textContent = user.plan || "Free";
         lastLoginSpan.textContent = user.lastLogin || "Today";
 
         if (user.profilePic) profileImg.src = user.profilePic;
@@ -454,8 +531,7 @@ async function editPost(postId) {
 
         localStorage.setItem("editPostId", postId);
 
-        // Show edit form
-        document.getElementById("edit-form-box").style.display = "block";
+       
 
     } catch (err) {
         console.log(err);
