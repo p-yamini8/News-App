@@ -62,12 +62,16 @@
 
    <div id="account-details" style="display: none; margin-top:15px; max-height:500px; overflow-y:auto;">
  
-        
+      
         <h3>Your Account</h3>
      Profile Image
-        <img id="profile-img" src="./default-user.png" style="
-            width:90px;height:90px;border-radius:50%;border:2px solid #444;margin-bottom:10px;">
-        
+<img id="profile-img" src="./default-user.png"
+  style="width:90px;height:90px;border-radius:50%;border:2px solid #444;margin-bottom:10px;">
+<br>
+
+<input type="file" id="profile-file" style="display:none;">
+<button id="addprofile-image">Add Image</button>
+
         <p><strong>Name:</strong> <span id="acc-name"></span></p>
         <p><strong>Email:</strong> <span id="acc-email"></span></p>
         <p><strong>Last Login:</strong> <span id="last-login"></span></p>
@@ -165,10 +169,10 @@ function toggleSection(id) {
 }
 
 // PROFILE INFO 
+
 const nameSpan = document.getElementById('acc-name');
 const emailSpan = document.getElementById('acc-email');
 const lastLoginSpan = document.getElementById('last-login');
-const profileImg = document.getElementById('profile-img');
 const editProfilebtn=document.getElementById("edit-profile-btn");
 const likesList = document.getElementById('likes-list');
 const unlikesList = document.getElementById('unlikes-list');
@@ -177,10 +181,42 @@ const myPostsList = document.getElementById('myposts-list');
 const submiteditProfile = document.getElementById("submit-profile-btn");
 const accountBtn = document.getElementById('account-btn');
 const accountDetails = document.getElementById('account-details');
+const profileImg = document.getElementById('profile-img');
+
+document.getElementById('addprofile-image').addEventListener('click', () => {
+    document.getElementById('profile-file').click();
+});
+
+document.getElementById('profile-file').addEventListener('change', async function () {
+
+    const file = this.files[0];
+    console.log(document.getElementById('profile-file').files[0]);
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`${BASE}/user/upload-profile`, {
+        method: "PUT",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        },
+        body: formData
+    });
+
+    const data = await res.json();
+    if (data.imageUrl) {
+        document.getElementById('profile-img').src = data.imageUrl;
+        alert("Profile Image Updated");
+    }
+});
+
 editProfilebtn.addEventListener('click',async(e)=>{
   e.preventDefault();
   document.getElementById('edit-profile').style.display = 'block';
 });
+
 submiteditProfile.addEventListener('click',async(e)=>{
   e.preventDefault();
 try{
@@ -423,7 +459,7 @@ if(!token)
 /* Toggle account card */
 
    accountBtn.addEventListener("click", async(e) => {
-    alert('123')
+   
     e.preventDefault();
   if (accountDetails.style.display === "none" || accountDetails.style.display === "") {
     accountDetails.style.display = "block";
@@ -446,12 +482,12 @@ async function loadAccountDetails() {
         });
 
         const user = await res.json();
-
+console.log('user image',user.profileImage);
         nameSpan.textContent = user.name;
         emailSpan.textContent = user.email;
         lastLoginSpan.textContent = user.lastLogin || "Today";
 
-        if (user.profilePic) profileImg.src = user.profilePic;
+        if (user.profileImage) profileImg.src = user.profileImage;
 
         localStorage.setItem("role", user.role);
         localStorage.setItem("userId", user.id);

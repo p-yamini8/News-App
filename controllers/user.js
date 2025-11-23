@@ -77,7 +77,7 @@ exports.userLogin=async(req,res)=>{
 exports.getProfile=async(req,res)=>{
   try{
     const user=await User.findByPk(req.user.id,{
-      attributes:['name','email']
+      attributes:['name','email', 'profileImage']
     });
     if(!user)
     {
@@ -145,5 +145,28 @@ exports.getEditProfile = async (req, res) => {
 
   } catch (err) {
     return res.status(500).json({ message: "Server error", error: err });
+  }
+};
+exports.uploadImage=async(req,res)=>{
+   try {
+    const userId = req.user.id;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No image uploaded" });
+    }
+    console.log('userid',userId,req.file.location)
+
+    const imageUrl = req.file.location; // AWS file link
+const user=await User.findOne({where: { id: userId } });
+await user.update({ profileImage: imageUrl });
+  
+    return res.status(200).json({
+      message: "Profile Image Updated",
+      imageUrl
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
   }
 };
