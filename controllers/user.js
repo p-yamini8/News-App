@@ -77,7 +77,7 @@ exports.userLogin=async(req,res)=>{
 exports.getProfile=async(req,res)=>{
   try{
     const user=await User.findByPk(req.user.id,{
-      attributes:['name','email', 'profileimage']
+      attributes:['name','email', 'profileImage']
     });
     if(!user)
     {
@@ -140,7 +140,7 @@ exports.getEditProfile = async (req, res) => {
     return res.status(200).json({
       name: user.name,
       email: user.email,
-      profilePic: user.profilePic || null
+      profileImage: user.profileImage || null
     });
 
   } catch (err) {
@@ -159,7 +159,7 @@ exports.uploadImage=async(req,res)=>{
 
     const imageUrl = req.file.location; // AWS file link
 const user=await User.findOne({where: { id: userId } });
-await user.update({ profileimage: imageUrl });
+await user.update({ profileImage: imageUrl });
   
     return res.status(200).json({
       message: "Profile Image Updated",
