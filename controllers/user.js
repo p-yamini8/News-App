@@ -77,7 +77,7 @@ exports.userLogin=async(req,res)=>{
 exports.getProfile=async(req,res)=>{
   try{
     const user=await User.findByPk(req.user.id,{
-      attributes:['name','email', 'profileImage']
+      attributes:['name','email', 'profileimage']
     });
     if(!user)
     {
@@ -153,12 +153,13 @@ exports.uploadImage=async(req,res)=>{
 
     if (!req.file) {
       return res.status(400).json({ message: "No image uploaded" });
+      
     }
     console.log('userid',userId,req.file.location)
 
     const imageUrl = req.file.location; // AWS file link
 const user=await User.findOne({where: { id: userId } });
-await user.update({ profileImage: imageUrl });
+await user.update({ profileimage: imageUrl });
   
     return res.status(200).json({
       message: "Profile Image Updated",
