@@ -176,3 +176,40 @@ nav a:hover {
   object-fit: contain;  /* Full image, no crop */
   background-color: #000; /* optional */
 }
+  .section-box {
+            border:1px solid #ccc;
+            padding:10px;
+            margin-top:10px;
+            border-radius:10px;
+            background:#f7f7f7;
+        }
+        .section-box h3 {
+            margin:0;
+            cursor:pointer;
+            padding:5px;
+        }
+        .hidden {
+            display:none;
+        }
+        .post-item {
+            padding:8px;
+            background:white;
+            margin:6px 0;
+            border-radius:6px;
+            display:flex;
+            justify-content:space-between;
+            border:1px solid #ddd;
+        }
+        .section {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+        .post-btn {
+            padding:5px 10px;
+            border:none;
+            border-radius:5px;
+            cursor:pointer;
+        }
+        .edit-btn { background:#007bff; color:white; }
+        .delete-btn { background:#d11a2a; color:white; }
