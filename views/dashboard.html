@@ -14,6 +14,7 @@
 </div>
 
 <nav>
+   <div class="nav-scroll">
     <a href="dashboard.html">News</a>
     <a href="./politics/politics.html">Politics</a>
     <a href="./business/business.html">Business</a>
@@ -21,8 +22,8 @@
     <a href="./sports/sports.html">Sports</a>
     <a href="./movies/movies.html">Movies</a>
     <a href="admin.html">Post</a>
-
-    <button id="account-btn">Account</button>
+</div>
+<button id="account-btn">Account</button>
     </nav>
 
    <div id="account-details" style="display: none; margin-top:15px; max-height:500px; overflow-y:auto;">
@@ -39,7 +40,7 @@
 
         <p><strong>Name:</strong> <span id="acc-name"></span></p>
         <p><strong>Email:</strong> <span id="acc-email"></span></p>
-        <p><strong>Last Login:</strong> <span id="last-login"></span></p>
+       
          <button id="edit-profile-btn">Edit Profile</button>
          <hr>
 
@@ -137,7 +138,6 @@ function toggleSection(id) {
 
 const nameSpan = document.getElementById('acc-name');
 const emailSpan = document.getElementById('acc-email');
-const lastLoginSpan = document.getElementById('last-login');
 const editProfilebtn=document.getElementById("edit-profile-btn");
 const likesList = document.getElementById('likes-list');
 const unlikesList = document.getElementById('unlikes-list');

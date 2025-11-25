@@ -4,10 +4,9 @@ body {
   padding: 0;
   font-family: "Poppins", sans-serif;
   background: #f7f8fc;
-   position: relative;
+  position: relative;
   overflow-x: hidden;
 }
-
 
 /* Header */
 #head {
@@ -24,38 +23,15 @@ body {
   font-weight: 700;
 }
 
-/* Navigation Bar */
-nav {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 15px 25px;
-  background: white;
-  border-bottom: 2px solid #eee;
-}
-
-nav a {
-  text-decoration: none;
-  color: #333;
-  font-size: 17px;
-  font-weight: 500;
-  transition: 0.3s;
-}
-
-nav a:hover {
-  color: #2575fc;
-  transform: scale(1.05);
-}
-
 /* Account Button */
 #account-btn {
-  margin-left: auto;
-  padding: 10px 15px;
+  padding: 8px 12px;
   border: none;
-  background: linear-gradient(45deg, #ff7eb3, #ff758c);
+  background: #007bff;
   color: white;
-  font-size: 15px;
-  border-radius: 8px;
+  border-radius: 5px;
+  margin-left: 10px;
+  flex-shrink: 0;
   cursor: pointer;
   transition: 0.3s;
 }
@@ -76,6 +52,9 @@ nav a:hover {
   animation: slideDown 0.3s ease-in-out;
   position: absolute;
   right: 20px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 10px;
 }
 
 #account-details h3 {
@@ -123,93 +102,127 @@ nav a:hover {
     opacity: 1;
   }
 }
-.scroll-box {
-    width: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding-right: 5px;
-    margin-top: 10px;
-    border: 1px solid #ccc;
-    background: #d7cd0a;
-    border-radius: 8px;
-}
 
-
-
-.card {
-    width: 100%;
-    max-width: 100%;
-    margin: 10px auto;
-    background: white;
-    border-radius: 12px;
-    padding: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    overflow: hidden;   
-}
-#account-details {
-    max-height: 500px;   /* Adjust height as needed */
-    overflow-y: auto;    /* Enable vertical scroll */
-    padding-right: 10px; /* Space for scrollbar */
-}
-
-/* Optional: Beautiful scrollbar (Chrome only) */
+/* Scrollbar Styling */
 #account-details::-webkit-scrollbar {
-    width: 8px;
+  width: 8px;
 }
 
 #account-details::-webkit-scrollbar-track {
-    background: #eee;
-    border-radius: 10px;
+  background: #eee;
+  border-radius: 10px;
 }
 
 #account-details::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 10px;
+  background: #888;
+  border-radius: 10px;
 }
 
 #account-details::-webkit-scrollbar-thumb:hover {
-    background: #555;
+  background: #555;
 }
+
+.scroll-box {
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 5px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  background: #d7cd0a;
+  border-radius: 8px;
+}
+
+.card {
+  width: 100%;
+  max-width: 100%;
+  margin: 10px auto;
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
 .post-image {
   width: 100vw;
   height: 100vh;
-  object-fit: contain;  /* Full image, no crop */
-  background-color: #000; /* optional */
-}
-  .section-box {
-            border:1px solid #ccc;
-            padding:10px;
-            margin-top:10px;
-            border-radius:10px;
-            background:#f7f7f7;
-        }
-        .section-box h3 {
-            margin:0;
-            cursor:pointer;
-            padding:5px;
-        }
-        .hidden {
-            display:none;
-        }
-        .post-item {
-            padding:8px;
-            background:white;
-            margin:6px 0;
-            border-radius:6px;
-            display:flex;
-            justify-content:space-between;
-            border:1px solid #ddd;
-        }
-        .section {
-    display: flex;
-    flex-wrap: wrap;
+  object-fit: contain;
+  background-color: #000;
 }
 
-        .post-btn {
-            padding:5px 10px;
-            border:none;
-            border-radius:5px;
-            cursor:pointer;
-        }
-        .edit-btn { background:#007bff; color:white; }
-        .delete-btn { background:#d11a2a; color:white; }
+.section-box {
+  border:1px solid #ccc;
+  padding:10px;
+  margin-top:10px;
+  border-radius:10px;
+  background:#f7f7f7;
+}
+
+.section-box h3 {
+  margin:0;
+  cursor:pointer;
+  padding:5px;
+}
+
+.hidden {
+  display:none;
+}
+
+.post-item {
+  padding:8px;
+  background:white;
+  margin:6px 0;
+  border-radius:6px;
+  display:flex;
+  justify-content:space-between;
+  border:1px solid #ddd;
+}
+
+.section {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.post-btn {
+  padding:5px 10px;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+.edit-btn { background:#007bff; color:white; }
+.delete-btn { background:#d11a2a; color:white; }
+
+/* ✅ SCROLLABLE NAVBAR */
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.nav-scroll {
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+  gap: 15px;
+  flex: 1;
+  padding-bottom: 5px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.nav-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+nav a {
+  text-decoration: none;
+  padding: 8px 12px;
+  color: black;
+  font-weight: 500;
+  flex-shrink: 0;
+}
