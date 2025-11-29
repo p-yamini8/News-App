@@ -173,7 +173,9 @@ document.getElementById('profile-file').addEventListener('change', async functio
     const data = await res.json();
     if (data.imageUrl) {
         document.getElementById('profile-img').src = data.imageUrl;
+loadAccountDetails()
         alert("Profile Image Updated");
+
     }
 });
 
@@ -447,14 +449,14 @@ async function loadAccountDetails() {
         });
 
         const user = await res.json();
-console.log('user image',user.profileImage);
+
         nameSpan.textContent = user.name;
         emailSpan.textContent = user.email;
       
 
         if (user.profileImage) profileImg.src = user.profileImage;
 
-        localStorage.setItem("role", user.role);
+       
         localStorage.setItem("userId", user.id);
 
     } catch (err) {
@@ -471,7 +473,7 @@ async function loadMyPosts() {
       
         const token = localStorage.getItem("token");
         const userId = localStorage.getItem("userId");
-        const role = localStorage.getItem("role");
+    
 
         const res = await fetch(`${BASE}/post/my-posts`, {
             method:'GET',
