@@ -8,6 +8,7 @@
 <body>
 
 <h1>Saved Posts</h1>
+ <a href="../dashboard.html">Back</a>
 <div id="saved-container">
   <li id="saved-posts"></li>
 </div>
@@ -21,6 +22,10 @@ async function loadSavedPosts() {
   try {
     const token = localStorage.getItem("token");
 
+       if(!token)
+{
+    window.location.href='../login.html'
+}
     const res = await fetch(`${BASE}/post/saved`, {
       headers: { Authorization: `Bearer ${token}` }
     });
