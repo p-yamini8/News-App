@@ -23,7 +23,7 @@ async function loadSportsPosts() {
     window.location.href='../login.html'
 }
 
-    const res = await fetch(`${BASE}/post/getPost?category=sports`, {
+    const res = await fetch(`${BASE}/post/getPost?category=Sports`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
 
@@ -37,7 +37,9 @@ async function loadSportsPosts() {
       div.classList.add('card');
       div.dataset.postId = p.id;
       const postedTime = new Date(p.createdAt).toLocaleString();
-
+  const imageUrl = (p.image && (p.image.startsWith('http://') || p.image.startsWith('https://')))
+        ? p.image
+        : `${BASE}${p.image || '/uploads/default.png'}`;
       div.innerHTML = `
         <img src="${imageUrl}" alt="Post Image" class="post-image">
         <div class="card-content">
