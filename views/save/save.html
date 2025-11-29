@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saved posts</title>
+</head>
+<body>
+
+<h1>Saved Posts</h1>
+<div id="saved-container">
+  <li id="saved-posts"></li>
+</div>
+
+<script>
+
+const BASE = window.location.origin;
+
+// ------------------ LOAD SAVED POSTS ------------------
+async function loadSavedPosts() {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`${BASE}/post/saved`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const data = await res.json();
+    const savedPosts = data.posts;
+
+    const container = document.getElementById("saved-posts");
+    container.innerHTML = "";
+
+    if (!savedPosts || savedPosts.length === 0) {
+      container.innerHTML = "<h3>No saved posts found</h3>";
+      return;
+    }
+
+    savedPosts.forEach(async (p) => {
+
+      const div = document.createElement("div");
+      div.className = "post-card";
+
+      div.innerHTML = `
+        <img src="${p.image.startsWith('http') ? p.image : BASE + p.image}" class="post-image">
+        <h2>${p.title}</h2>
+        <p>${p.description}</p>
+
+        <div>
+          <button class="like-btn">❤ Like (<span class="like-count">0</span>)</button>
+          <button class="dislike-btn">💔 Dislike (<span class="dislike-count">0</span>)</button>
+          <button class="save-btn" id="save-${p.id}" data-saved="true"
+            onclick="toggleSave(${p.id})">Saved</button>
+          <button class="comment-btn">💬 Comment</button>
+          <button class="share-btn">🔗 Share</button>
+        </div>
+
+        <div class="comment-list" style="display:none"></div>
+      `;
+
+      container.appendChild(div);
+
+      // Load Like Counts
+      try {
+        const likeRes = await fetch(`${BASE}/like-comment/likes/${p.id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const { likes, dislikes, userReaction } = await likeRes.json();
+
+        div.querySelector('.like-count').textContent = likes;
+        div.querySelector('.dislike-count').textContent = dislikes;
+
+        if (userReaction === "like")
+          div.querySelector('.like-btn').style.backgroundColor = "green";
+
+        if (userReaction === "dislike")
+          div.querySelector('.dislike-btn').style.backgroundColor = "red";
+
+      } catch (err) {
+        console.log("Error loading likes:", err);
+      }
+
+      // Like button
+      div.querySelector(".like-btn").addEventListener("click", async () => {
+        await updateReaction(p.id, "like", div);
+      });
+
+      // Dislike button
+      div.querySelector(".dislike-btn").addEventListener("click", async () => {
+        await updateReaction(p.id, "dislike", div);
+      });
+
+      // Comment button
+      const commentBtn = div.querySelector(".comment-btn");
+      const commentList = div.querySelector(".comment-list");
+
+      commentBtn.addEventListener("click", async () => {
+        if (commentList.style.display === "none") {
+          commentList.style.display = "block";
+          await loadComments(p.id, commentList, token);
+        } else {
+          commentList.style.display = "none";
+        }
+      });
+
+      // Share Button
+      div.querySelector(".share-btn").addEventListener("click", async () => {
+        try {
+          const url = window.location.href;
+
+          if (navigator.share) {
+            await navigator.share({ title: p.title, text: p.description, url });
+          } else {
+            await navigator.clipboard.writeText(url);
+            alert("Link copied!");
+          }
+        } catch {}
+      });
+
+    });
+
+  } catch (err) {
+    console.error(err);
+    alert("Error loading saved posts");
+  }
+}
+
+
+// ------------------ LIKE / DISLIKE ------------------
+async function updateReaction(postId, type, div) {
+  try {
+    const token = localStorage.getItem("token");
+
+    await fetch(`${BASE}/like-comment/like`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ postId, type })
+    });
+
+    const res = await fetch(`${BASE}/like-comment/likes/${postId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const { likes, dislikes, userReaction } = await res.json();
+
+    div.querySelector(".like-count").textContent = likes;
+    div.querySelector(".dislike-count").textContent = dislikes;
+
+    div.querySelector(".like-btn").style.backgroundColor =
+      userReaction === "like" ? "green" : "";
+
+    div.querySelector(".dislike-btn").style.backgroundColor =
+      userReaction === "dislike" ? "red" : "";
+
+  } catch (err) {
+    console.log("Reaction error:", err);
+  }
+}
+
+
+// ------------------ SAVE / UNSAVE ------------------
+async function toggleSave(postId) {
+  try {
+    const token = localStorage.getItem("token");
+
+    await fetch(`${BASE}/post/save/${postId}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ type: "unsave" })
+    });
+
+    alert("Post removed from saved!");
+    loadSavedPosts();
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+
+// ------------------ COMMENTS ------------------
+async function loadComments(postId, commentList, token) {
+  try {
+    const res = await fetch(`${BASE}/like-comment/comments/${postId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    if (!res.ok) return;
+
+    const comments = await res.json();
+
+    commentList.innerHTML = comments.map(c =>
+      `<p><strong>${c.user?.name || 'User'}:</strong> ${c.comment}</p>`
+    ).join("");
+
+    // add comment box
+    const addBox = document.createElement("div");
+    addBox.innerHTML = `
+      <input type="text" placeholder="Write a comment..." id="commentInput-${postId}" style="width:70%">
+      <button id="addCommentBtn-${postId}">Post</button>
+    `;
+    commentList.appendChild(addBox);
+
+    document
+      .getElementById(`addCommentBtn-${postId}`)
+      .addEventListener("click", async () => {
+        const commentText = document.getElementById(`commentInput-${postId}`).value.trim();
+        if (!commentText) return;
+
+        await fetch(`${BASE}/like-comment/comment`, {
+          method: "POST",
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ postId, comment: commentText })
+        });
+
+        await loadComments(postId, commentList, token);
+      });
+
+  } catch (err) {
+    console.error('Error loading comments:', err);
+  }
+}
+
+loadSavedPosts();
+
+</script>
+
+</body>
+</html>

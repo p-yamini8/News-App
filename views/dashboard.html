@@ -22,6 +22,7 @@
     <a href="./sports/sports.html">Sports</a>
     <a href="./movies/movies.html">Movies</a>
     </div>
+    <a href="./save/save.html">Save</a>
     <a href="admin.html">Post</a>
 
 <button id="account-btn">Account</button>
@@ -45,15 +46,7 @@
          <button id="edit-profile-btn">Edit Profile</button>
          <hr>
 
-        <!-- Saved Posts Section-->
-        <div class="section-box">
-            <h3 onclick="toggleSection('saved-section')">📌 Saved Posts</h3>
-            <div id="saved-section" class="hidden">
-                <ol id="saved-list"></ol>
-                <button onclick="loadSavedPosts()">Load Saved Posts</button>
-                <ol id="saved-Posts"></ol>
-            </div>
-        </div>
+     
 
         <!-- User Posts -->
       <div class="section-box">
@@ -715,7 +708,7 @@ async function saveEditedPost() {
     });
 
     const data = await res.json();
-
+console.log(data)
     if (!res.ok) {
         alert(data.message || "Update failed");
         return;
@@ -728,7 +721,7 @@ async function saveEditedPost() {
 async function savePost(postId) {
   try {
     const token = localStorage.getItem("token");
-
+localStorage.setItem('postId',postId);
     // select correct button
     const btn = document.querySelector(`#save-${postId}`);
 
@@ -793,42 +786,6 @@ async function checkSaveStatus(postId) {
 }
 
 
-
-async function loadSavedPosts() {
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch(`${BASE}/post/saved`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    const data = await res.json();
-    const savedPosts = data.posts;
-
-    const container = document.getElementById("saved-Posts");
-    container.innerHTML = "";
-
-    if (!savedPosts || savedPosts.length === 0) {
-      container.innerHTML = "<h3>No saved posts found</h3>";
-      return;
-    }
-
-    savedPosts.forEach((p) => {
-      container.innerHTML += `
-        <div class="post-card">
-           
-            <h3>${p.title}</h3>
-            <p>${p.description}</p>
-        </div>
-      `;
-    });
-
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-loadSavedPosts();
 
 </script>
 
