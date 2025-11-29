@@ -21,11 +21,12 @@
     <a href="./fun/fun.html">Fun</a>
     <a href="./sports/sports.html">Sports</a>
     <a href="./movies/movies.html">Movies</a>
+    </div>
     <a href="admin.html">Post</a>
-</div>
+
 <button id="account-btn">Account</button>
     </nav>
-
+ 
    <div id="account-details" style="display: none; margin-top:15px; max-height:500px; overflow-y:auto;">
  
       
@@ -66,6 +67,7 @@
 
         <button onclick="loadMyPosts()">Load Your Posts</button>
     </div>
+
 </div>
 
         <!-- Likes -->
@@ -124,8 +126,9 @@
     <button onclick="saveEditedPost()" style="background:green; padding:8px 15px; border:none; color:white; border-radius:6px;">Save Changes</button>
     <button onclick="closeEditForm()" style="background:gray; padding:8px 15px; border:none; color:white; border-radius:6px;">Cancel</button>
 </div>
-  <div id="posts"></div>
  
+  <div id="posts"></div>
+
 <script>
 const BASE = window.location.origin;
 // Toggle Sections
