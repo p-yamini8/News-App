@@ -39,11 +39,7 @@ async function loadSportsPosts() {
       const postedTime = new Date(p.createdAt).toLocaleString();
 
       div.innerHTML = `
-        <img src="${
-  p.image.startsWith('http://') || p.image.startsWith('https://')
-    ? p.image
-    : `${BASE}${p.image}`
-}" alt="Post Image" class="post-image">
+        <img src="${imageUrl}" alt="Post Image" class="post-image">
         <div class="card-content">
           <h2>${p.title}</h2>
           <p>${p.description}</p>
