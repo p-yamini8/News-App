@@ -13,8 +13,8 @@
   <div id="posts"></div>
 
   <script>
+const BASE = window.location.origin;
 
- const BASE = window.location.origin;
 async function loadBusinessPosts() {
   try {
     const token = localStorage.getItem('token');

@@ -26,6 +26,7 @@ Category:
   </form>
 
   <script>
+    const BASE = window.location.origin;
     const form = document.getElementById('admin-form');
 
     form.addEventListener('submit', async (e) => {
@@ -44,7 +45,7 @@ Category:
       formData.append('category', category);
 
       try {
-        const res = await fetch('/post/addPost', {
+        const res = await fetch(`${BASE}/post/addPost`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`

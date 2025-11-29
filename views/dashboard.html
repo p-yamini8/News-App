@@ -450,7 +450,7 @@ async function loadAccountDetails() {
 console.log('user image',user.profileImage);
         nameSpan.textContent = user.name;
         emailSpan.textContent = user.email;
-        lastLoginSpan.textContent = user.lastLogin || "Today";
+      
 
         if (user.profileImage) profileImg.src = user.profileImage;
 
