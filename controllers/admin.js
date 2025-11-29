@@ -48,6 +48,7 @@ exports.getPost = async (req, res) => {
     const posts = await Post.findAll({
       where: whereClause,
       include: [{ model: User, as: "user", attributes: ["id", "name", "email"] }],
+      order: [["createdAt", "DESC"]] 
     });
 
     console.log(` ${posts.length} posts found`);
@@ -152,8 +153,8 @@ if(!post)
 
 }
 await post.destroy();
-post.save();
-return res.satus(200).json({message:'post deleted successfully'})
+
+return res.status(200).json({message:'post deleted successfully'})
   }
   catch(err)
   {

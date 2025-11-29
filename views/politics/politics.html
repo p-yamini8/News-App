@@ -10,12 +10,9 @@
   <h1>Politics News</h1>
   <a href="../dashboard.html">Back</a>
   <div id="posts"></div>
-  
-<script>
-const BASE = 
-  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-    ? "http://localhost:3000"
-    : window.location.origin;
+  </body>
+  <script>
+const BASE = window.location.origin;
  // automatically uses localhost when local, your render domain when live
 
 async function loadPoliticsPosts() {
