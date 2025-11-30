@@ -119,18 +119,11 @@ exports.updatePost = async (req, res) => {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    let newImage = post.image;  // keep old image if not uploaded
-
-    if (req.file) {
-    newImage = req.file.location;  
-
-    }
-
     await post.update({
       title,
       description,
-      category,
-      image: newImage
+      category
+
     });
 
     return res.status(200).json({
@@ -184,9 +177,6 @@ exports.savePost = async (req, res) => {
       // Create new record (type will be 'save' or 'unsave')
       saveRecord = await Save.create({ userId, postId, type });
     }
-
-    // Optionally: if you prefer to delete 'unsave' records instead of storing them, you could:
-    // if (type === 'unsave') { await saveRecord.destroy(); return res.json({ message: 'unsaved', type: 'unsave' }); }
 
     return res.status(200).json({ message: 'Success', type: saveRecord.type });
   } catch (err) {

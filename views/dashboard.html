@@ -175,10 +175,6 @@ loadAccountDetails()
     }
 });
 
-editProfilebtn.addEventListener('click',async(e)=>{
-  e.preventDefault();
-  document.getElementById('edit-profile').style.display = 'block';
-});
 
 submiteditProfile.addEventListener('click',async(e)=>{
   e.preventDefault();
@@ -217,6 +213,7 @@ else {
 })
 editProfilebtn.addEventListener("click", async () => {
   try {
+    document.getElementById('edit-profile').style.display = 'block';
     const token = localStorage.getItem("token");
 
     const res = await fetch(`${BASE}/user/edit-profile`, {
@@ -505,6 +502,38 @@ data.posts.forEach(post => {
     }
 }
 
+async function saveEditedPost() {
+  const postId = localStorage.getItem("editPostId");
+  const token = localStorage.getItem("token");
+
+  const title = document.getElementById("edit-title").value;
+  const description = document.getElementById("edit-description").value;
+  const category = document.getElementById("edit-category").value;
+  // const imageFile = document.getElementById("edit-image").files[0];
+
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("description", description);
+  formData.append("category", category);
+  // if (imageFile) formData.append("image", imageFile);
+
+  const res = await fetch(`${BASE}/post/update/${postId}`, {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    alert("Post updated!");
+    closeEditForm();
+    loadMyPosts();
+  } else {
+    alert("Error updating post");
+  }
+}
+
 async function editPost(postId) {
     try {document.getElementById("edit-form-box").style.display = "block";
         const token = localStorage.getItem("token");
@@ -685,26 +714,17 @@ async function saveEditedPost() {
     const postId = localStorage.getItem("editPostId");
     const token = localStorage.getItem("token");
 
-    const title = document.getElementById("edit-title").value;
-    const description = document.getElementById("edit-description").value;
-    const category = document.getElementById("edit-category").value;
-    const imageFile = document.getElementById("edit-image").files[0];
-
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("category", category);
-
-    if (imageFile) {
-        formData.append("image", imageFile); // only when changed
-    }
+   const title = document.getElementById("edit-title").value;
+  const description = document.getElementById("edit-description").value;
+ const category = document.getElementById("edit-category").value;
+   
 
     const res = await fetch(`${BASE}/post/update/${postId}`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
+           "Content-Type": "application/json"
  },
-        body: formData
+        body:JSON.stringify({title,description,category})
     });
 
     const data = await res.json();
@@ -785,7 +805,10 @@ async function checkSaveStatus(postId) {
   }
 }
 
-
+async function closeEditForm()
+{
+  window.location.href = "/dashboard.html";
+}
 
 </script>
 

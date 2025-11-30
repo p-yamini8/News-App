@@ -2,6 +2,7 @@ const path=require('path');
 const express=require('express');
 const bodyParser=require('body-parser');
 const cors=require('cors');
+const multer = require('multer');
 const sequelize=require('./util/database')
 const app=express();
 const userRoutes=require('./routes/user')
@@ -10,8 +11,9 @@ const likeRoutes=require('./routes/like')
 const postRoutes=require('./routes/post')
 app.use(cors());
 app.use(express.json());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
+
 
 require('./models/associations');
 

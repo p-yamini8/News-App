@@ -15,11 +15,12 @@ const router=express.Router();
 // });
 const upload = require('../middleware/uploadtos3'); 
 // const upload = multer({ storage: storage });
+router.put('/update/:postId',auth.authenticate,adminController.updatePost)
 router.post('/addPost',auth.authenticate, upload.single('image'), adminController.addPost);
 router.get('/getPost',adminController.getPost);
 router.get('/my-posts',auth.authenticate,adminController.getMyPosts);
 router.get('/edit/:postId',auth.authenticate,adminController.editPost);
-router.put('/update/:postId',auth.authenticate,upload.single("image"),adminController.updatePost)
+
 router.delete('/delete/:postId',auth.authenticate,adminController.deletePost);
 router.post('/save/:postId', auth.authenticate, adminController.savePost);
 router.get('/save/:postId', auth.authenticate, adminController.getSaveStatus);
