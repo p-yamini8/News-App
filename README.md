@@ -125,19 +125,32 @@ AWS IAM User
 Public S3 access for image loading
 
 📂 Folder Structure
+
 NewsExpress/
+
 │── controllers/
+
 │── middleware/
+
 │── models/
+
 │── routes/
+
 │── utils/
+
 │── views/
+
 │── uploads/        (optional local upload)
+
 │── server.js
+
 │── package.json
+
 │── .env
 
+
 ⚙️ Environment Variables (.env)
+
 PORT=3000
 JWT_SECRET=your_secret_key
 
@@ -151,4 +164,5 @@ DB_USER=root
 DB_PASSWORD=yourpassword
 
 DB_NAME=newsapp
+
 
