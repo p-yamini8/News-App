@@ -1,130 +1,165 @@
 ﻿🌟 NewsExpress – Modern Full-Stack News Application
+ ============================================================
 
-📦 GitHub Repository: https://github.com/p-yamini8/News-App
+**📦 GitHub Repository:** https://github.com/p-yamini8/News-App
 
-🚀 Live link: https://news-app-1-umxk.onrender.com
+**🚀 Live link:** https://news-app-1-umxk.onrender.com
 
- Demo Link: https://drive.google.com/file/d/1IXpbmC4g8AOS1E9uc_VbTet395BBk3yx/view?usp=drivesdk
+ **🎥 Demo Link:** https://drive.google.com/file/d/1IXpbmC4g8AOS1E9uc_VbTet395BBk3yx/view?usp=drivesdk
 
 A powerful full-stack News App with image upload, JWT authentication, profile management, saved posts, and like/unlike features — all built using Node.js, Express, Sequelize, MySQL, AWS S3, HTML, CSS, JavaScript.
 
 🎯 Key Features
+===================
 👤 User Account Features
-🖼️ Profile Picture Upload (AWS S3)
+-----------------------------
 
-Upload profile photo using Multer + Multer-S3
+<h4>🖼️ Profile Picture Upload (AWS S3)</h4>
 
-Stored securely in AWS S3
+- Upload profile photo using Multer + Multer-S3
 
-Automatically loads in dashboard
+- Stored securely in AWS S3
+
+- Automatically loads in dashboard
 
 ✏️ Edit Profile
+----------------
 
-Update name, email, and profile image
+- Update name, email, and profile image
 
-Changes shown instantly
+- Changes shown instantly
 
-Uses JWT for secure access
+- Uses JWT for secure access
 
 🔐 JWT Authentication
+-----------------------
 
-Signup & Login
+- Signup & Login
 
-Token saved in browser
+- Token saved in browser
 
-Secure protected routes
+- Secure protected routes
 
 📰 News Features
-📝 Create News Post
+-------------------
 
-Add title, content, and image
+<h4>📝 Create News Post</h4>
 
-Image uploaded to AWS S3
+- Add title, content, and image
 
-Clean and modern UI
+- Image uploaded to AWS S3
+
+- Clean and modern UI
 
 ✏️ Edit News
+---------------
 
-Update headline, text, and image
+- Update headline, text, and image
 
-Only the uploader can edit
+- Only the uploader can edit
 
 ❌ Delete News
+-------------------
 
-Secure deletion with owner check
+- Secure deletion with owner check
 
 🌍 View All News
+-------------------
 
-Loads all posts on homepage
+- Loads all posts on homepage
 
-Supports images + formatted text
+- Supports images + formatted text
+
+  🏷️ Category-Based Post Filtering
+  ----------------------------------------
+
+Your NewsExpress app now supports dynamic category filtering, allowing users to instantly view posts from:
+
+- 🎉 Fun
+
+- 🏛️ Politics
+
+- 💼 Business
+
+- 🎬 Movies
+
+- 🏅 Sports
+
+The UI updates smoothly, fetching posts based on category using optimized API endpoints.
 
 ❤️ Likes / Saved Features
-❤️ Like Post
+-----------------------------
 
-Users can like any post
+<h4>❤️ Like Post</h4>
 
-Like stored in database
+- Users can like any post
 
-Heart icon updates instantly
+- Like stored in database
 
-💔 Unlike Post
+- Heart icon updates instantly
 
-User can remove their like
+<h4>💔 Unlike Post</h4>
 
-Like removed from database
+- User can remove their like
 
-UI updates without refresh
+- Like removed from database
 
-📚 Saved Posts
+- UI updates without refresh
 
-Users can save/bookmark news for later
+<h4>📚 Saved Posts</h4>
 
-Saved posts page shows only their saved items
+- Users can save/bookmark news for later
 
-Stored in a separate Saved table
+- Saved posts page shows only their saved items
 
-⭐ Liked Posts Page
+- Stored in a separate Saved table
 
-Shows all posts the user has liked
+<h4>⭐ Comment </h4>
 
-Uses Like table to fetch liked posts
+- Users can comment any post
+
+- comment stored in database
+
 
 🧰 Tech Stack
+===============
 
 🌐 Frontend
+-------------
 
-HTML5
+- HTML5
 
-CSS3
+- CSS
 
-JavaScript (fetch API)
+- JavaScript (fetch API)
 
-Responsive UI
+- Responsive UI
 
 🛠 Backend
+-----------
 
-Node.js
+- Node.js
 
-Express
+- Express
 
-Sequelize ORM
+- Sequelize ORM
 
-JWT Authentication
+- JWT Authentication
 
-Multer + Multer-S3
+- Multer + Multer-S3
 
-MySQL Database
+- MySQL Database
 
 ☁ Cloud
 
-AWS S3 (image uploading)
+- AWS S3 (image uploading)
 
-AWS IAM User
+- AWS IAM User
 
-Public S3 access for image loading
+- Public S3 access for image loading
 
 📂 Folder Structure
+--------------------
 
 NewsExpress/
 
@@ -150,19 +185,27 @@ NewsExpress/
 
 
 ⚙️ Environment Variables (.env)
+=================================
 
 PORT=3000
+
 JWT_SECRET=your_secret_key
 
 AWS_BUCKET_NAME=news-express-images
+
 AWS_REGION=us-east-1
+
 AWS_ACCESS_KEY=YOUR_AWS_ACCESS_KEY
+
 AWS_SECRET_KEY=YOUR_AWS_SECRET_KEY
 
 DB_HOST=localhost
+
 DB_USER=root
+
 DB_PASSWORD=yourpassword
 
 DB_NAME=newsapp
+
 
 
