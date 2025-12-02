@@ -5,7 +5,7 @@
 
 **🚀 Live link:** https://news-app-1-umxk.onrender.com
 
- **🎥 Demo Link:** https://drive.google.com/file/d/1IXpbmC4g8AOS1E9uc_VbTet395BBk3yx/view?usp=drivesdk
+ **🎥 Demo Link:** [https://drive.google.com/file/d/1IXpbmC4g8AOS1E9uc_VbTet395BBk3yx/view?usp=drivesdk](https://drive.google.com/file/d/1JC3-Wdp98cnvtE9KHssNlumYOCmvZiBx/view?usp=drivesdk)
 
 A powerful full-stack News App with image upload, JWT authentication, profile management, saved posts, and like/unlike features — all built using Node.js, Express, Sequelize, MySQL, AWS S3, HTML, CSS, JavaScript.
 
@@ -206,6 +206,7 @@ DB_USER=root
 DB_PASSWORD=yourpassword
 
 DB_NAME=newsapp
+
 
 
 
